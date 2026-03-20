@@ -26,7 +26,7 @@
     --source-nyt: #e5e7eb;
     --source-scmp: #facc15;
     --topic-markets:   #34d399;
-    --topic-economics: #60a5fa;
+    --topic-economy: #60a5fa;
     --topic-politics:  #f472b6;
     --topic-tech:      #a78bfa;
     --topic-world:     #fbbf24;
@@ -183,7 +183,7 @@
     text-transform: uppercase;
   }
   .topic-Markets   { color: var(--topic-markets);   border: 1px solid #0d3326; background: #061a12; }
-  .topic-Economics { color: var(--topic-economics); border: 1px solid #0e2040; background: #060e1a; }
+  .topic-Economy { color: var(--topic-economy); border: 1px solid #0e2040; background: #060e1a; }
   .topic-Politics  { color: var(--topic-politics);  border: 1px solid #3d1127; background: #1e0813; }
   .topic-Tech      { color: var(--topic-tech);      border: 1px solid #2d1f4a; background: #160e24; }
   .topic-World     { color: var(--topic-world);     border: 1px solid #3d2f0a; background: #1e1705; }
@@ -359,21 +359,21 @@ window.logPull = function(count) {
   <div id="sidebar">
     <div class="sidebar-section">
       <div class="sidebar-label">Source</div>
-      <button class="filter-btn active" data-src="BBG" onclick="toggleFilter(this,'src')">Bloomberg</button>
-      <button class="filter-btn active" data-src="WSJ" onclick="toggleFilter(this,'src')">WSJ</button>
-      <button class="filter-btn active" data-src="NYT"  onclick="toggleFilter(this,'src')">NYT</button>
-      <button class="filter-btn active" data-src="SCMP" onclick="toggleFilter(this,'src')">SCMP</button>
+      <button class="filter-btn" data-src="BBG" onclick="toggleFilter(this,'src')">Bloomberg</button>
+      <button class="filter-btn" data-src="WSJ" onclick="toggleFilter(this,'src')">WSJ</button>
+      <button class="filter-btn" data-src="NYT"  onclick="toggleFilter(this,'src')">NYT</button>
+      <button class="filter-btn" data-src="SCMP" onclick="toggleFilter(this,'src')">SCMP</button>
     </div>
     <div class="sidebar-section">
       <div class="sidebar-label">Topic</div>
-      <button class="filter-btn active" data-topic="Markets"   onclick="toggleFilter(this,'topic')">Markets</button>
-      <button class="filter-btn active" data-topic="Economics" onclick="toggleFilter(this,'topic')">Economics</button>
-      <button class="filter-btn active" data-topic="Politics"  onclick="toggleFilter(this,'topic')">Politics</button>
-      <button class="filter-btn active" data-topic="Tech"      onclick="toggleFilter(this,'topic')">Tech</button>
-      <button class="filter-btn active" data-topic="World"     onclick="toggleFilter(this,'topic')">World</button>
-      <button class="filter-btn active" data-topic="US"        onclick="toggleFilter(this,'topic')">US</button>
-      <button class="filter-btn active" data-topic="Business"  onclick="toggleFilter(this,'topic')">Business</button>
-      <button class="filter-btn active" data-topic="China"     onclick="toggleFilter(this,'topic')">China</button>
+      <button class="filter-btn" data-topic="Economy"   onclick="toggleFilter(this,'topic')">Economy</button>
+      <button class="filter-btn" data-topic="Markets"   onclick="toggleFilter(this,'topic')">Markets</button>
+      <button class="filter-btn" data-topic="Politics"  onclick="toggleFilter(this,'topic')">Politics</button>
+      <button class="filter-btn" data-topic="Tech"      onclick="toggleFilter(this,'topic')">Tech</button>
+      <button class="filter-btn" data-topic="Business"  onclick="toggleFilter(this,'topic')">Business</button>
+      <button class="filter-btn" data-topic="World"     onclick="toggleFilter(this,'topic')">World</button>
+      <button class="filter-btn" data-topic="China"     onclick="toggleFilter(this,'topic')">China</button>
+      <button class="filter-btn" data-topic="US"        onclick="toggleFilter(this,'topic')">US</button>
     </div>
   </div>
 </div>
@@ -387,11 +387,11 @@ const CORS_PROXIES = [
 ];
 
 const FEEDS = [
-  { url: 'https://feeds.bloomberg.com/economics/news.rss',                    src: 'BBG', topic: 'Economics' },
+  { url: 'https://feeds.bloomberg.com/economics/news.rss',                    src: 'BBG', topic: 'Economy' },
   { url: 'https://feeds.bloomberg.com/markets/news.rss',                      src: 'BBG', topic: 'Markets'   },
   { url: 'https://feeds.bloomberg.com/politics/news.rss',                     src: 'BBG', topic: 'Politics'  },
   { url: 'https://feeds.bloomberg.com/technology/news.rss',                   src: 'BBG', topic: 'Tech'      },
-  { url: 'https://feeds.content.dowjones.io/public/rss/socialeconomyfeed',    src: 'WSJ', topic: 'Economics' },
+  { url: 'https://feeds.content.dowjones.io/public/rss/socialeconomyfeed',    src: 'WSJ', topic: 'Economy' },
   { url: 'https://feeds.content.dowjones.io/public/rss/RSSMarketsMain',       src: 'WSJ', topic: 'Markets'   },
   { url: 'https://feeds.content.dowjones.io/public/rss/socialpoliticsfeed',   src: 'WSJ', topic: 'Politics'  },
   { url: 'https://feeds.content.dowjones.io/public/rss/RSSWorldNews',         src: 'WSJ', topic: 'World'     },
@@ -401,20 +401,20 @@ const FEEDS = [
   { url: 'https://rss.nytimes.com/services/xml/rss/nyt/US.xml',               src: 'NYT', topic: 'US'        },
   { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Politics.xml',         src: 'NYT', topic: 'Politics'  },
   { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Business.xml',         src: 'NYT', topic: 'Business'  },
-  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Economy.xml',          src: 'NYT', topic: 'Economics' },
+  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Economy.xml',          src: 'NYT', topic: 'Economy' },
   { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Dealbook.xml',         src: 'NYT', topic: 'Markets'  },
   { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',       src: 'NYT',  topic: 'Tech'      },
   { url: 'https://www.scmp.com/rss/91/feed/',                                   src: 'SCMP', topic: 'World'     },
   { url: 'https://www.scmp.com/rss/318198/feed/',                               src: 'SCMP', topic: 'Politics'  },
-  { url: 'https://www.scmp.com/rss/318421/feed/',                               src: 'SCMP', topic: 'Economics' },
+  { url: 'https://www.scmp.com/rss/318421/feed/',                               src: 'SCMP', topic: 'Economy' },
   { url: 'https://www.scmp.com/rss/92/feed/',                                    src: 'SCMP', topic: 'Business'  },
   { url: 'https://www.scmp.com/rss/36/feed/',                                    src: 'SCMP', topic: 'Tech'      },
   { url: 'https://www.scmp.com/rss/4/feed',                                      src: 'SCMP', topic: 'China'     },
 ];
 
 let allItems = [];
-let activeSources = new Set(['BBG','WSJ','NYT','SCMP']);
-let activeTopics  = new Set(['Markets','Economics','Politics','Tech','World','US','Business','China']);
+let activeSources = new Set();
+let activeTopics  = new Set();
 
 // ── FETCH ──────────────────────────────────────────────────────────────────
 
@@ -499,7 +499,7 @@ function render() {
   document.getElementById('count').textContent = `${filtered.length} stories`;
 
   if (filtered.length === 0) {
-    body.innerHTML = `<tr id="empty-row"><td colspan="4">NO RESULTS</td></tr>`;
+    body.innerHTML = `<tr id="empty-row"><td colspan="4">NO FEEDS ACTIVE — SELECT SOURCES AND TOPICS FROM THE MENU ON THE RIGHT</td></tr>`;
     return;
   }
 
