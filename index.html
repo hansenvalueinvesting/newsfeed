@@ -293,7 +293,7 @@ const countRef = ref(db, 'newsfeed/lifetimeCount');
 onValue(countRef, snap => {
   const val = snap.val() || 0;
   const el = document.getElementById('lifetime-count');
-  if (el) el.textContent = `${val.toLocaleString()} universal total articles pulled`;
+  if (el) el.textContent = `${val.toLocaleString()} universal lifetime total articles pulled`;
 });
 
 // Expose increment function for loadAll to call
