@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>newsfeed.</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400&display=swap');
 
@@ -102,6 +103,7 @@
   #refresh-btn:hover { color: var(--accent); }
 
   #last-updated { font-size: 10px; color: var(--text-dimmer); }
+  #lifetime-count { font-size: 10px; color: var(--text-dimmer); }
 
   /* PROGRESS BAR */
   #progress { height: 1px; background: var(--border); overflow: hidden; }
@@ -269,6 +271,36 @@
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
 </style>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, runTransaction, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBma3Xd482KuQcdadaOtQVsp4na0wqgiZY",
+  authDomain: "newsfeed-582bf.firebaseapp.com",
+  databaseURL: "https://newsfeed-582bf-default-rtdb.firebaseio.com",
+  projectId: "newsfeed-582bf",
+  storageBucket: "newsfeed-582bf.firebasestorage.app",
+  messagingSenderId: "469870749559",
+  appId: "1:469870749559:web:1749386c8caf923595a372"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const countRef = ref(db, 'newsfeed/lifetimeCount');
+
+// Live-sync the displayed counter
+onValue(countRef, snap => {
+  const val = snap.val() || 0;
+  const el = document.getElementById('lifetime-count');
+  if (el) el.textContent = `${val.toLocaleString()} articles pulled`;
+});
+
+// Expose increment function for loadAll to call
+window.logPull = function(count) {
+  runTransaction(countRef, current => (current || 0) + count);
+};
+</script>
 </head>
 <body>
 
@@ -279,6 +311,7 @@
     <span id="status-text">IDLE</span>
   </div>
   <span id="last-updated"></span>
+  <span id="lifetime-count"></span>
   <span id="count"></span>
   <button id="refresh-btn" onclick="loadAll()">↺ REFRESH</button>
 </div>
@@ -424,6 +457,7 @@ async function loadAll() {
   document.getElementById('last-updated').textContent =
     `updated ${now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false})}`;
 
+  if (window.logPull) window.logPull(results.length);
   render();
 }
 
