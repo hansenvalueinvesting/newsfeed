@@ -32,6 +32,7 @@
     --topic-world:     #fbbf24;
     --topic-us:        #fb923c;
     --topic-business:  #38bdf8;
+    --topic-china:     #f87171;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -188,6 +189,7 @@
   .topic-World     { color: var(--topic-world);     border: 1px solid #3d2f0a; background: #1e1705; }
   .topic-US        { color: var(--topic-us);        border: 1px solid #3d1f0a; background: #1e0f05; }
   .topic-Business  { color: var(--topic-business);  border: 1px solid #0d2e3d; background: #06151e; }
+  .topic-China     { color: var(--topic-china);     border: 1px solid #3d1010; background: #1e0808; }
 
   .headline-link {
     color: var(--text);
@@ -371,6 +373,7 @@ window.logPull = function(count) {
       <button class="filter-btn active" data-topic="World"     onclick="toggleFilter(this,'topic')">World</button>
       <button class="filter-btn active" data-topic="US"        onclick="toggleFilter(this,'topic')">US</button>
       <button class="filter-btn active" data-topic="Business"  onclick="toggleFilter(this,'topic')">Business</button>
+      <button class="filter-btn active" data-topic="China"     onclick="toggleFilter(this,'topic')">China</button>
     </div>
   </div>
 </div>
@@ -406,11 +409,12 @@ const FEEDS = [
   { url: 'https://www.scmp.com/rss/318421/feed/',                               src: 'SCMP', topic: 'Economics' },
   { url: 'https://www.scmp.com/rss/92/feed/',                                    src: 'SCMP', topic: 'Business'  },
   { url: 'https://www.scmp.com/rss/36/feed/',                                    src: 'SCMP', topic: 'Tech'      },
+  { url: 'https://www.scmp.com/rss/4/feed',                                      src: 'SCMP', topic: 'China'     },
 ];
 
 let allItems = [];
 let activeSources = new Set(['BBG','WSJ','NYT','SCMP']);
-let activeTopics  = new Set(['Markets','Economics','Politics','Tech','World','US','Business']);
+let activeTopics  = new Set(['Markets','Economics','Politics','Tech','World','US','Business','China']);
 
 // ── FETCH ──────────────────────────────────────────────────────────────────
 
