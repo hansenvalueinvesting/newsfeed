@@ -24,6 +24,7 @@
     --source-bbg: #f97316;
     --source-wsj: #3b82f6;
     --source-nyt: #e5e7eb;
+    --source-scmp: #facc15;
     --topic-markets:   #34d399;
     --topic-economics: #60a5fa;
     --topic-politics:  #f472b6;
@@ -167,7 +168,8 @@
   }
   .src-BBG { color: var(--source-bbg); border: 1px solid #3a1f0a; background: #1a0f05; }
   .src-WSJ { color: var(--source-wsj); border: 1px solid #0e2040; background: #060e1a; }
-  .src-NYT { color: var(--source-nyt); border: 1px solid #2a2a2a; background: #141414; }
+  .src-NYT  { color: var(--source-nyt);  border: 1px solid #2a2a2a; background: #141414; }
+  .src-SCMP { color: var(--source-scmp); border: 1px solid #3a3000; background: #1a1500; }
 
   .cell-tag { white-space: nowrap; }
 
@@ -357,7 +359,8 @@ window.logPull = function(count) {
       <div class="sidebar-label">Source</div>
       <button class="filter-btn active" data-src="BBG" onclick="toggleFilter(this,'src')">Bloomberg</button>
       <button class="filter-btn active" data-src="WSJ" onclick="toggleFilter(this,'src')">WSJ</button>
-      <button class="filter-btn active" data-src="NYT" onclick="toggleFilter(this,'src')">NYT</button>
+      <button class="filter-btn active" data-src="NYT"  onclick="toggleFilter(this,'src')">NYT</button>
+      <button class="filter-btn active" data-src="SCMP" onclick="toggleFilter(this,'src')">SCMP</button>
     </div>
     <div class="sidebar-section">
       <div class="sidebar-label">Topic</div>
@@ -397,11 +400,16 @@ const FEEDS = [
   { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Business.xml',         src: 'NYT', topic: 'Business'  },
   { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Economy.xml',          src: 'NYT', topic: 'Economics' },
   { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Dealbook.xml',         src: 'NYT', topic: 'Markets'  },
-  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',       src: 'NYT', topic: 'Tech'      },
+  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',       src: 'NYT',  topic: 'Tech'      },
+  { url: 'https://www.scmp.com/rss/91/feed/',                                   src: 'SCMP', topic: 'World'     },
+  { url: 'https://www.scmp.com/rss/318198/feed/',                               src: 'SCMP', topic: 'Politics'  },
+  { url: 'https://www.scmp.com/rss/318421/feed/',                               src: 'SCMP', topic: 'Economics' },
+  { url: 'https://www.scmp.com/rss/92/feed/',                                    src: 'SCMP', topic: 'Business'  },
+  { url: 'https://www.scmp.com/rss/36/feed/',                                    src: 'SCMP', topic: 'Tech'      },
 ];
 
 let allItems = [];
-let activeSources = new Set(['BBG','WSJ','NYT']);
+let activeSources = new Set(['BBG','WSJ','NYT','SCMP']);
 let activeTopics  = new Set(['Markets','Economics','Politics','Tech','World','US','Business']);
 
 // ── FETCH ──────────────────────────────────────────────────────────────────
