@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FEED</title>
+<title>newsfeed.</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400&display=swap');
 
@@ -85,45 +85,16 @@
 
   #count { margin-left: auto; font-size: 10px; color: var(--text-dim); }
 
-  /* FILTERS */
-  #filters {
-    border-bottom: 1px solid var(--border);
-    padding: 6px 16px;
+  /* LAYOUT */
+  #body-layout {
     display: flex;
-    gap: 4px;
-    flex-wrap: wrap;
-    background: var(--bg);
-    position: sticky;
-    top: 37px;
-    z-index: 99;
-  }
-
-  .filter-btn {
-    background: none;
-    border: 1px solid var(--border2);
-    color: var(--text-dim);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 0.1em;
-    padding: 3px 8px;
-    cursor: pointer;
-    text-transform: uppercase;
-    transition: all 0.15s;
-    border-radius: 2px;
-  }
-  .filter-btn:hover { border-color: #444; color: var(--text); }
-  .filter-btn.active { border-color: var(--accent); color: var(--accent); background: #1a1a1a; }
-
-  /* SOURCE FILTER GROUP */
-  .filter-sep {
-    width: 1px;
-    background: var(--border);
-    margin: 0 4px;
-    align-self: stretch;
+    align-items: flex-start;
   }
 
   /* FEED TABLE */
   #feed-wrap {
+    flex: 1;
+    min-width: 0;
     padding: 0;
   }
 
@@ -134,7 +105,7 @@
 
   #feed-table thead {
     position: sticky;
-    top: 73px;
+    top: 37px;
     z-index: 98;
     background: var(--bg2);
   }
@@ -149,6 +120,52 @@
     color: var(--text-dimmer);
     border-bottom: 1px solid var(--border);
   }
+
+  /* SIDEBAR */
+  #sidebar {
+    width: 160px;
+    flex-shrink: 0;
+    border-left: 1px solid var(--border);
+    padding: 14px 12px;
+    position: sticky;
+    top: 37px;
+    height: calc(100vh - 37px);
+    overflow-y: auto;
+    background: var(--bg);
+  }
+
+  .sidebar-section {
+    margin-bottom: 18px;
+  }
+
+  .sidebar-label {
+    font-size: 8px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-dimmer);
+    margin-bottom: 7px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .filter-btn {
+    display: block;
+    width: 100%;
+    background: none;
+    border: none;
+    border-left: 2px solid transparent;
+    color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    padding: 4px 6px;
+    cursor: pointer;
+    text-align: left;
+    text-transform: uppercase;
+    transition: all 0.12s;
+  }
+  .filter-btn:hover { color: var(--text); border-left-color: var(--border2); }
+  .filter-btn.active { color: var(--accent); border-left-color: var(--accent); }
 
   th.col-time { width: 80px; }
   th.col-source { width: 120px; }
@@ -292,7 +309,7 @@
 <body>
 
 <div id="header">
-  <span id="wordmark">FEED</span>
+  <span id="wordmark">newsfeed.</span>
   <div id="status">
     <div id="status-dot"></div>
     <span id="status-text">IDLE</span>
@@ -304,39 +321,42 @@
 
 <div id="progress"><div id="progress-bar"></div></div>
 
-<div id="filters">
-  <!-- Source filters -->
-  <button class="filter-btn active" data-src="ALL" onclick="toggleSource(this)">ALL</button>
-  <button class="filter-btn" data-src="BBG" onclick="toggleSource(this)">BBG</button>
-  <button class="filter-btn" data-src="WSJ" onclick="toggleSource(this)">WSJ</button>
-  <button class="filter-btn" data-src="NYT" onclick="toggleSource(this)">NYT</button>
-  <div class="filter-sep"></div>
-  <!-- Topic filters -->
-  <button class="filter-btn active" data-topic="ALL" onclick="toggleTopic(this)">ALL TOPICS</button>
-  <button class="filter-btn" data-topic="Markets" onclick="toggleTopic(this)">Markets</button>
-  <button class="filter-btn" data-topic="Economics" onclick="toggleTopic(this)">Economics</button>
-  <button class="filter-btn" data-topic="Politics" onclick="toggleTopic(this)">Politics</button>
-  <button class="filter-btn" data-topic="Tech" onclick="toggleTopic(this)">Tech</button>
-  <button class="filter-btn" data-topic="World" onclick="toggleTopic(this)">World</button>
-  <button class="filter-btn" data-topic="US" onclick="toggleTopic(this)">US</button>
-  <button class="filter-btn" data-topic="Business" onclick="toggleTopic(this)">Business</button>
-  <button class="filter-btn" data-topic="Dealbook" onclick="toggleTopic(this)">Dealbook</button>
-</div>
+<div id="body-layout">
+  <div id="feed-wrap">
+    <table id="feed-table">
+      <thead>
+        <tr>
+          <th class="col-time">TIME</th>
+          <th class="col-source">SOURCE</th>
+          <th class="col-tag">TOPIC</th>
+          <th class="col-headline">HEADLINE</th>
+        </tr>
+      </thead>
+      <tbody id="feed-body">
+        <tr id="loading-row"><td colspan="4">INITIALIZING...</td></tr>
+      </tbody>
+    </table>
+  </div>
 
-<div id="feed-wrap">
-  <table id="feed-table">
-    <thead>
-      <tr>
-        <th class="col-time">TIME</th>
-        <th class="col-source">SOURCE</th>
-        <th class="col-tag">TOPIC</th>
-        <th class="col-headline">HEADLINE</th>
-      </tr>
-    </thead>
-    <tbody id="feed-body">
-      <tr id="loading-row"><td colspan="4">INITIALIZING...</td></tr>
-    </tbody>
-  </table>
+  <div id="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Source</div>
+      <button class="filter-btn active" data-src="BBG" onclick="toggleFilter(this,'src')">Bloomberg</button>
+      <button class="filter-btn active" data-src="WSJ" onclick="toggleFilter(this,'src')">WSJ</button>
+      <button class="filter-btn active" data-src="NYT" onclick="toggleFilter(this,'src')">NYT</button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Topic</div>
+      <button class="filter-btn active" data-topic="Markets"   onclick="toggleFilter(this,'topic')">Markets</button>
+      <button class="filter-btn active" data-topic="Economics" onclick="toggleFilter(this,'topic')">Economics</button>
+      <button class="filter-btn active" data-topic="Politics"  onclick="toggleFilter(this,'topic')">Politics</button>
+      <button class="filter-btn active" data-topic="Tech"      onclick="toggleFilter(this,'topic')">Tech</button>
+      <button class="filter-btn active" data-topic="World"     onclick="toggleFilter(this,'topic')">World</button>
+      <button class="filter-btn active" data-topic="US"        onclick="toggleFilter(this,'topic')">US</button>
+      <button class="filter-btn active" data-topic="Business"  onclick="toggleFilter(this,'topic')">Business</button>
+      <button class="filter-btn active" data-topic="Dealbook"  onclick="toggleFilter(this,'topic')">Dealbook</button>
+    </div>
+  </div>
 </div>
 
 <div class="tooltip" id="tooltip"></div>
@@ -368,8 +388,8 @@ const FEEDS = [
 ];
 
 let allItems = [];
-let activeSource = 'ALL';
-let activeTopic  = 'ALL';
+let activeSources = new Set(['BBG','WSJ','NYT']);
+let activeTopics  = new Set(['Markets','Economics','Politics','Tech','World','US','Business','Dealbook']);
 
 // ── FETCH ──────────────────────────────────────────────────────────────────
 
@@ -451,11 +471,7 @@ async function loadAll() {
 
 function render() {
   const body = document.getElementById('feed-body');
-  const filtered = allItems.filter(i => {
-    const srcOk   = activeSource === 'ALL' || i.src   === activeSource;
-    const topicOk = activeTopic  === 'ALL' || i.topic === activeTopic;
-    return srcOk && topicOk;
-  });
+  const filtered = allItems.filter(i => activeSources.has(i.src) && activeTopics.has(i.topic));
 
   document.getElementById('count').textContent = `${filtered.length} stories`;
 
@@ -525,17 +541,28 @@ function hideTip() {
 
 // ── FILTERS ────────────────────────────────────────────────────────────────
 
-function toggleSource(btn) {
-  document.querySelectorAll('[data-src]').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  activeSource = btn.dataset.src;
-  render();
-}
-
-function toggleTopic(btn) {
-  document.querySelectorAll('[data-topic]').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  activeTopic = btn.dataset.topic;
+function toggleFilter(btn, type) {
+  if (type === 'src') {
+    const val = btn.dataset.src;
+    if (activeSources.has(val)) {
+      if (activeSources.size === 1) return; // keep at least one
+      activeSources.delete(val);
+      btn.classList.remove('active');
+    } else {
+      activeSources.add(val);
+      btn.classList.add('active');
+    }
+  } else {
+    const val = btn.dataset.topic;
+    if (activeTopics.has(val)) {
+      if (activeTopics.size === 1) return;
+      activeTopics.delete(val);
+      btn.classList.remove('active');
+    } else {
+      activeTopics.add(val);
+      btn.classList.add('active');
+    }
+  }
   render();
 }
 
