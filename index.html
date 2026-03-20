@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>newsfeed.</title>
+<title>📡 newsfeed.</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400&display=swap');
@@ -24,6 +24,13 @@
     --source-bbg: #f97316;
     --source-wsj: #3b82f6;
     --source-nyt: #e5e7eb;
+    --topic-markets:   #34d399;
+    --topic-economics: #60a5fa;
+    --topic-politics:  #f472b6;
+    --topic-tech:      #a78bfa;
+    --topic-world:     #fbbf24;
+    --topic-us:        #fb923c;
+    --topic-business:  #38bdf8;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -102,8 +109,8 @@
   }
   #refresh-btn:hover { color: var(--accent); }
 
-  #last-updated { font-size: 10px; color: var(--text-dimmer); }
-  #lifetime-count { font-size: 10px; color: var(--text-dimmer); }
+  #last-updated { font-size: 10px; color: var(--text-dim); }
+  #lifetime-count { font-size: 10px; color: var(--text-dim); }
 
   /* PROGRESS BAR */
   #progress { height: 1px; background: var(--border); overflow: hidden; }
@@ -162,13 +169,23 @@
   .src-WSJ { color: var(--source-wsj); border: 1px solid #0e2040; background: #060e1a; }
   .src-NYT { color: var(--source-nyt); border: 1px solid #2a2a2a; background: #141414; }
 
-  .cell-tag {
-    color: var(--text-dimmer);
+  .cell-tag { white-space: nowrap; }
+
+  .topic-badge {
     font-size: 9px;
+    font-weight: 500;
     letter-spacing: 0.08em;
+    padding: 1px 5px;
+    border-radius: 2px;
     text-transform: uppercase;
-    white-space: nowrap;
   }
+  .topic-Markets   { color: var(--topic-markets);   border: 1px solid #0d3326; background: #061a12; }
+  .topic-Economics { color: var(--topic-economics); border: 1px solid #0e2040; background: #060e1a; }
+  .topic-Politics  { color: var(--topic-politics);  border: 1px solid #3d1127; background: #1e0813; }
+  .topic-Tech      { color: var(--topic-tech);      border: 1px solid #2d1f4a; background: #160e24; }
+  .topic-World     { color: var(--topic-world);     border: 1px solid #3d2f0a; background: #1e1705; }
+  .topic-US        { color: var(--topic-us);        border: 1px solid #3d1f0a; background: #1e0f05; }
+  .topic-Business  { color: var(--topic-business);  border: 1px solid #0d2e3d; background: #06151e; }
 
   .headline-link {
     color: var(--text);
@@ -293,7 +310,7 @@ const countRef = ref(db, 'newsfeed/lifetimeCount');
 onValue(countRef, snap => {
   const val = snap.val() || 0;
   const el = document.getElementById('lifetime-count');
-  if (el) el.textContent = `${val.toLocaleString()} universal lifetime total articles pulled`;
+  if (el) el.textContent = `${val.toLocaleString()} universal lifetime total articles pulled.`;
 });
 
 // Expose increment function for loadAll to call
@@ -305,7 +322,7 @@ window.logPull = function(count) {
 <body>
 
 <div id="header">
-  <span id="wordmark">newsfeed.</span>
+  <span id="wordmark">📡 newsfeed.</span>
   <div id="status">
     <div id="status-dot"></div>
     <span id="status-text">IDLE</span>
@@ -483,7 +500,7 @@ function render() {
     return `<tr class="feed-row">
       <td class="cell-time"><span class="${ageClass}">${timeStr}</span></td>
       <td class="cell-source"><span class="source-badge src-${item.src}">${item.src}</span></td>
-      <td class="cell-tag">${item.topic}</td>
+      <td class="cell-tag"><span class="topic-badge topic-${item.topic}">${item.topic}</span></td>
       <td class="cell-headline">
         <a class="headline-link" href="${item.link}" target="_blank" rel="noopener"
            data-desc="${escapedDesc}"
