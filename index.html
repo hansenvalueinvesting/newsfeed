@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FEED</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400&display=swap');
+
+  :root {
+    --bg: #0a0a0a;
+    --bg2: #111111;
+    --bg3: #161616;
+    --border: #222222;
+    --border2: #2a2a2a;
+    --text: #c8c8c8;
+    --text-dim: #555;
+    --text-dimmer: #333;
+    --accent: #e8e8e8;
+    --green: #4ade80;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --blue: #60a5fa;
+    --purple: #a78bfa;
+    --source-bbg: #f97316;
+    --source-wsj: #3b82f6;
+    --source-nyt: #e5e7eb;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    line-height: 1.4;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  #header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  #wordmark {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  #status {
+    font-size: 10px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  #status-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--text-dimmer);
+    transition: background 0.3s;
+  }
+  #status-dot.loading { background: var(--amber); animation: pulse 1s infinite; }
+  #status-dot.live { background: var(--green); }
+  #status-dot.error { background: var(--red); }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  #count { margin-left: auto; font-size: 10px; color: var(--text-dim); }
+
+  /* FILTERS */
+  #filters {
+    border-bottom: 1px solid var(--border);
+    padding: 6px 16px;
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    background: var(--bg);
+    position: sticky;
+    top: 37px;
+    z-index: 99;
+  }
+
+  .filter-btn {
+    background: none;
+    border: 1px solid var(--border2);
+    color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    padding: 3px 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.15s;
+    border-radius: 2px;
+  }
+  .filter-btn:hover { border-color: #444; color: var(--text); }
+  .filter-btn.active { border-color: var(--accent); color: var(--accent); background: #1a1a1a; }
+
+  /* SOURCE FILTER GROUP */
+  .filter-sep {
+    width: 1px;
+    background: var(--border);
+    margin: 0 4px;
+    align-self: stretch;
+  }
+
+  /* FEED TABLE */
+  #feed-wrap {
+    padding: 0;
+  }
+
+  #feed-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  #feed-table thead {
+    position: sticky;
+    top: 73px;
+    z-index: 98;
+    background: var(--bg2);
+  }
+
+  #feed-table thead th {
+    padding: 5px 16px;
+    text-align: left;
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dimmer);
+    border-bottom: 1px solid var(--border);
+  }
+
+  th.col-time { width: 80px; }
+  th.col-source { width: 120px; }
+  th.col-tag { width: 80px; }
+  th.col-headline { }
+
+  .feed-row {
+    border-bottom: 1px solid #141414;
+    transition: background 0.1s;
+    cursor: default;
+  }
+
+  .feed-row:hover { background: var(--bg3); }
+
+  .feed-row td {
+    padding: 6px 16px;
+    vertical-align: middle;
+  }
+
+  /* TIME */
+  .cell-time {
+    color: var(--text-dimmer);
+    font-size: 10px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cell-time .age-fresh { color: var(--green); }
+  .cell-time .age-recent { color: var(--amber); }
+  .cell-time .age-old { color: var(--text-dimmer); }
+
+  /* SOURCE */
+  .cell-source {
+    white-space: nowrap;
+  }
+
+  .source-badge {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    padding: 1px 5px;
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
+
+  .src-BBG { color: var(--source-bbg); border: 1px solid #3a1f0a; background: #1a0f05; }
+  .src-WSJ { color: var(--source-wsj); border: 1px solid #0e2040; background: #060e1a; }
+  .src-NYT { color: var(--source-nyt); border: 1px solid #2a2a2a; background: #141414; }
+
+  /* TAG */
+  .cell-tag {
+    color: var(--text-dimmer);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* HEADLINE */
+  .cell-headline {
+    position: relative;
+  }
+
+  .headline-link {
+    color: var(--text);
+    text-decoration: none;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 300;
+    line-height: 1.3;
+    transition: color 0.1s;
+  }
+
+  .headline-link:hover { color: var(--accent); }
+
+  /* TOOLTIP */
+  .tooltip {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    padding: 10px 14px;
+    max-width: 420px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 300;
+    color: #aaa;
+    line-height: 1.5;
+    pointer-events: none;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  }
+
+  /* LOADING / EMPTY STATES */
+  #loading-row td, #empty-row td {
+    padding: 40px 16px;
+    color: var(--text-dimmer);
+    font-size: 10px;
+    text-align: center;
+    letter-spacing: 0.1em;
+  }
+
+  /* PROGRESS BAR */
+  #progress {
+    height: 1px;
+    background: var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #progress-bar {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width 0.3s;
+  }
+
+  /* REFRESH BTN */
+  #refresh-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    cursor: pointer;
+    padding: 2px 6px;
+    letter-spacing: 0.1em;
+    transition: color 0.15s;
+  }
+  #refresh-btn:hover { color: var(--accent); }
+
+  /* LAST UPDATED */
+  #last-updated { font-size: 10px; color: var(--text-dimmer); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <span id="wordmark">FEED</span>
+  <div id="status">
+    <div id="status-dot"></div>
+    <span id="status-text">IDLE</span>
+  </div>
+  <span id="last-updated"></span>
+  <span id="count"></span>
+  <button id="refresh-btn" onclick="loadAll()">↺ REFRESH</button>
+</div>
+
+<div id="progress"><div id="progress-bar"></div></div>
+
+<div id="filters">
+  <!-- Source filters -->
+  <button class="filter-btn active" data-src="ALL" onclick="toggleSource(this)">ALL</button>
+  <button class="filter-btn" data-src="BBG" onclick="toggleSource(this)">BBG</button>
+  <button class="filter-btn" data-src="WSJ" onclick="toggleSource(this)">WSJ</button>
+  <button class="filter-btn" data-src="NYT" onclick="toggleSource(this)">NYT</button>
+  <div class="filter-sep"></div>
+  <!-- Topic filters -->
+  <button class="filter-btn active" data-topic="ALL" onclick="toggleTopic(this)">ALL TOPICS</button>
+  <button class="filter-btn" data-topic="Markets" onclick="toggleTopic(this)">Markets</button>
+  <button class="filter-btn" data-topic="Economics" onclick="toggleTopic(this)">Economics</button>
+  <button class="filter-btn" data-topic="Politics" onclick="toggleTopic(this)">Politics</button>
+  <button class="filter-btn" data-topic="Tech" onclick="toggleTopic(this)">Tech</button>
+  <button class="filter-btn" data-topic="World" onclick="toggleTopic(this)">World</button>
+  <button class="filter-btn" data-topic="US" onclick="toggleTopic(this)">US</button>
+  <button class="filter-btn" data-topic="Business" onclick="toggleTopic(this)">Business</button>
+  <button class="filter-btn" data-topic="Dealbook" onclick="toggleTopic(this)">Dealbook</button>
+</div>
+
+<div id="feed-wrap">
+  <table id="feed-table">
+    <thead>
+      <tr>
+        <th class="col-time">TIME</th>
+        <th class="col-source">SOURCE</th>
+        <th class="col-tag">TOPIC</th>
+        <th class="col-headline">HEADLINE</th>
+      </tr>
+    </thead>
+    <tbody id="feed-body">
+      <tr id="loading-row"><td colspan="4">INITIALIZING...</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const CORS_PROXIES = [
+  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+];
+
+const FEEDS = [
+  { url: 'https://feeds.bloomberg.com/economics/news.rss',   src: 'BBG', topic: 'Economics' },
+  { url: 'https://feeds.bloomberg.com/markets/news.rss',     src: 'BBG', topic: 'Markets'   },
+  { url: 'https://feeds.bloomberg.com/politics/news.rss',    src: 'BBG', topic: 'Politics'  },
+  { url: 'https://feeds.bloomberg.com/technology/news.rss',  src: 'BBG', topic: 'Tech'      },
+  { url: 'https://feeds.content.dowjones.io/public/rss/socialeconomyfeed',   src: 'WSJ', topic: 'Economics' },
+  { url: 'https://feeds.content.dowjones.io/public/rss/RSSMarketsMain',      src: 'WSJ', topic: 'Markets'   },
+  { url: 'https://feeds.content.dowjones.io/public/rss/socialpoliticsfeed',  src: 'WSJ', topic: 'Politics'  },
+  { url: 'https://feeds.content.dowjones.io/public/rss/RSSWorldNews',        src: 'WSJ', topic: 'World'     },
+  { url: 'https://feeds.content.dowjones.io/public/rss/RSSUSnews',           src: 'WSJ', topic: 'US'        },
+  { url: 'https://feeds.content.dowjones.io/public/rss/WSJcomUSBusiness',    src: 'WSJ', topic: 'Business'  },
+  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/World.xml',     src: 'NYT', topic: 'World'     },
+  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/US.xml',        src: 'NYT', topic: 'US'        },
+  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Politics.xml',  src: 'NYT', topic: 'Politics'  },
+  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Business.xml',  src: 'NYT', topic: 'Business'  },
+  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Economy.xml',   src: 'NYT', topic: 'Economics' },
+  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Dealbook.xml',  src: 'NYT', topic: 'Dealbook'  },
+  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',src: 'NYT', topic: 'Tech'      },
+];
+
+let allItems = [];
+let activeSource = 'ALL';
+let activeTopic  = 'ALL';
+
+// ── FETCH ──────────────────────────────────────────────────────────────────
+
+async function fetchFeed(feed, proxyIdx = 0) {
+  if (proxyIdx >= CORS_PROXIES.length) return [];
+  const proxyUrl = CORS_PROXIES[proxyIdx](feed.url);
+  try {
+    const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(8000) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    return parseRSS(text, feed);
+  } catch {
+    return fetchFeed(feed, proxyIdx + 1);
+  }
+}
+
+function parseRSS(xml, feed) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(xml, 'text/xml');
+  const items = Array.from(doc.querySelectorAll('item'));
+  return items.map(item => {
+    const title   = item.querySelector('title')?.textContent?.trim() || '';
+    const link    = item.querySelector('link')?.textContent?.trim() || '';
+    const pubDate = item.querySelector('pubDate')?.textContent?.trim() || '';
+    const desc    = item.querySelector('description')?.textContent?.trim() || '';
+    const date    = pubDate ? new Date(pubDate) : new Date(0);
+
+    // Strip HTML from description
+    const div = document.createElement('div');
+    div.innerHTML = desc;
+    const cleanDesc = div.textContent.trim().slice(0, 280);
+
+    return { title, link, date, desc: cleanDesc, src: feed.src, topic: feed.topic };
+  }).filter(i => i.title && i.date.getFullYear() > 2000);
+}
+
+// ── LOAD ALL ───────────────────────────────────────────────────────────────
+
+async function loadAll() {
+  setStatus('loading', 'FETCHING');
+  setProgress(0);
+
+  const results = [];
+  let done = 0;
+
+  const promises = FEEDS.map(async feed => {
+    const items = await fetchFeed(feed);
+    results.push(...items);
+    done++;
+    setProgress(Math.round((done / FEEDS.length) * 100));
+  });
+
+  await Promise.allSettled(promises);
+
+  // Deduplicate by title
+  const seen = new Set();
+  allItems = results.filter(i => {
+    const key = i.title.toLowerCase().slice(0, 60);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  // Sort newest first
+  allItems.sort((a, b) => b.date - a.date);
+
+  setStatus('live', `LIVE · ${allItems.length} items`);
+  setProgress(100);
+  setTimeout(() => setProgress(0), 600);
+
+  const now = new Date();
+  document.getElementById('last-updated').textContent =
+    `updated ${now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false})}`;
+
+  render();
+}
+
+// ── RENDER ─────────────────────────────────────────────────────────────────
+
+function render() {
+  const body = document.getElementById('feed-body');
+  const filtered = allItems.filter(i => {
+    const srcOk   = activeSource === 'ALL' || i.src   === activeSource;
+    const topicOk = activeTopic  === 'ALL' || i.topic === activeTopic;
+    return srcOk && topicOk;
+  });
+
+  document.getElementById('count').textContent = `${filtered.length} stories`;
+
+  if (filtered.length === 0) {
+    body.innerHTML = `<tr id="empty-row"><td colspan="4">NO RESULTS</td></tr>`;
+    return;
+  }
+
+  const rows = filtered.map(item => {
+    const { ageLabel, ageClass } = formatAge(item.date);
+    const timeStr = item.date.toLocaleTimeString('en-US', {
+      hour: '2-digit', minute: '2-digit', hour12: false
+    });
+    const escapedDesc  = escHtml(item.desc || '—');
+    const escapedTitle = escHtml(item.title);
+
+    return `<tr class="feed-row">
+      <td class="cell-time">
+        <span class="${ageClass}">${timeStr}</span>
+      </td>
+      <td class="cell-source">
+        <span class="source-badge src-${item.src}">${item.src}</span>
+      </td>
+      <td class="cell-tag">${item.topic}</td>
+      <td class="cell-headline">
+        <a class="headline-link"
+           href="${item.link}" target="_blank" rel="noopener"
+           data-desc="${escapedDesc}"
+           onmouseenter="showTip(event, this)"
+           onmousemove="moveTip(event)"
+           onmouseleave="hideTip()"
+        >${escapedTitle}</a>
+      </td>
+    </tr>`;
+  }).join('');
+
+  body.innerHTML = rows;
+}
+
+// ── TOOLTIP ────────────────────────────────────────────────────────────────
+
+const tip = document.getElementById('tooltip');
+
+function showTip(e, el) {
+  const desc = el.getAttribute('data-desc');
+  if (!desc || desc === '—') return;
+  tip.textContent = desc;
+  tip.style.display = 'block';
+  moveTip(e);
+}
+
+function moveTip(e) {
+  const pad = 14;
+  const tw = tip.offsetWidth;
+  const th = tip.offsetHeight;
+  let x = e.clientX + pad;
+  let y = e.clientY + pad;
+  if (x + tw > window.innerWidth  - 8) x = e.clientX - tw - pad;
+  if (y + th > window.innerHeight - 8) y = e.clientY - th - pad;
+  tip.style.left = x + 'px';
+  tip.style.top  = y + 'px';
+}
+
+function hideTip() {
+  tip.style.display = 'none';
+}
+
+// ── FILTERS ────────────────────────────────────────────────────────────────
+
+function toggleSource(btn) {
+  document.querySelectorAll('[data-src]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeSource = btn.dataset.src;
+  render();
+}
+
+function toggleTopic(btn) {
+  document.querySelectorAll('[data-topic]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeTopic = btn.dataset.topic;
+  render();
+}
+
+// ── HELPERS ────────────────────────────────────────────────────────────────
+
+function setStatus(state, text) {
+  document.getElementById('status-dot').className = state;
+  document.getElementById('status-text').textContent = text;
+}
+
+function setProgress(pct) {
+  document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+function formatAge(date) {
+  const mins = Math.floor((Date.now() - date) / 60000);
+  if (mins < 30)  return { ageLabel: `${mins}m`,  ageClass: 'age-fresh'  };
+  if (mins < 180) return { ageLabel: `${Math.floor(mins/60)}h`, ageClass: 'age-recent' };
+  return { ageLabel: `${Math.floor(mins/60)}h`, ageClass: 'age-old' };
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+
+loadAll();
+
+// Auto-refresh every 5 minutes
+setInterval(loadAll, 5 * 60 * 1000);
+</script>
+</body>
+</html>
