@@ -292,83 +292,118 @@
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
 
+  
+  /* ── DESKTOP ONLY ─────────────────────────────────────────────────────── */
+  @media (min-width: 769px) {
+    #filter-toggle  { display: none; }
+    #filter-overlay { display: none; }
+    #header-meta    { display: contents; }
+    .mobile-meta    { display: none; }
+  }
+
   /* ── MOBILE ────────────────────────────────────────────────────────────── */
   @media (max-width: 768px) {
 
-    /* Header wraps to two lines */
+    /* HEADER */
     #header {
       flex-wrap: wrap;
-      gap: 10px;
+      row-gap: 6px;
+      column-gap: 10px;
       padding: 8px 12px;
     }
 
     #wordmark { font-size: 10px; }
 
-    /* Push filter toggle to far right on first row */
+    #status { flex-shrink: 0; }
+
     #filter-toggle {
-      display: flex;
+      display: flex !important;
+      visibility: visible !important;
+      align-items: center;
       margin-left: auto;
+      background: none;
+      border: 1px solid #2a2a2a;
+      color: #c8c8c8;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      padding: 4px 10px;
+      cursor: pointer;
+      text-transform: uppercase;
+      border-radius: 2px;
     }
 
-    /* Second row: status + meta info */
     #header-meta {
-      display: flex;
+      display: flex !important;
       width: 100%;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
     }
 
     #count { margin-left: auto; }
 
-    /* Hide desktop sidebar */
-    #sidebar { display: none; }
+    #refresh-btn { padding: 2px 0; }
 
-    /* Feed takes full width */
+    /* LAYOUT */
+    #sidebar { display: none !important; }
+    #body-layout { display: block; }
     #feed-wrap { width: 100%; }
 
-    /* Hide TIME and TOPIC columns */
-    .col-time, .col-tag,
-    .cell-time, .cell-tag { display: none; }
+    /* TABLE: hide time + topic columns */
+    th.col-time, th.col-tag,
+    td.cell-time, td.cell-tag { display: none !important; }
 
-    /* Tighten rows */
-    .feed-row td { padding: 8px 10px; }
+    th.col-source { width: 64px; }
 
-    /* Headline cell: stack source + headline + time */
-    .cell-headline { display: flex; flex-direction: column; gap: 3px; }
+    /* ROWS */
+    .feed-row td { padding: 9px 10px; }
+    .cell-source  { vertical-align: top; padding-top: 11px; }
+
+    /* HEADLINE CELL: stack headline then meta below */
+    .cell-headline {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
 
     .headline-link {
       font-size: 13px;
-      line-height: 1.35;
+      line-height: 1.4;
     }
 
+    /* Mobile meta: topic badge + time shown below headline */
     .mobile-meta {
-      display: flex;
+      display: flex !important;
       align-items: center;
       gap: 6px;
-      margin-top: 2px;
+      flex-wrap: wrap;
     }
 
-    /* Source col stays but tighter */
-    th.col-source { width: 70px; }
-    .cell-source { vertical-align: top; padding-top: 10px; }
+    .mobile-meta .age-fresh  { color: #4ade80; font-size: 9px; }
+    .mobile-meta .age-recent { color: #fbbf24; font-size: 9px; }
+    .mobile-meta .age-old    { color: #333;    font-size: 9px; }
 
-    /* Filter overlay */
+    /* FILTER OVERLAY */
     #filter-overlay {
       display: none;
       position: fixed;
-      inset: 0;
+      top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.85);
-      z-index: 200;
+      z-index: 9999;
       flex-direction: column;
       justify-content: flex-end;
+      -webkit-overflow-scrolling: touch;
     }
-    #filter-overlay.open { display: flex; }
+
+    #filter-overlay.open {
+      display: flex !important;
+    }
 
     #filter-sheet {
-      background: #111;
-      border-top: 1px solid var(--border);
-      padding: 20px 16px 32px;
+      background: #111111;
+      border-top: 1px solid #222222;
+      padding: 20px 16px 40px;
       max-height: 80vh;
       overflow-y: auto;
     }
@@ -377,67 +412,65 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }
 
     #filter-sheet-title {
       font-size: 10px;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: var(--text-dim);
+      color: #555;
     }
 
     #filter-close {
       background: none;
       border: none;
-      color: var(--text-dim);
+      color: #555;
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 14px;
+      font-size: 16px;
       cursor: pointer;
       padding: 0 4px;
+      line-height: 1;
     }
-    #filter-close:hover { color: var(--accent); }
 
-    .mobile-filter-group { margin-bottom: 20px; }
+    .mobile-filter-group { margin-bottom: 22px; }
 
     .mobile-filter-label {
       font-size: 8px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: var(--text-dimmer);
-      margin-bottom: 8px;
+      color: #333;
+      margin-bottom: 10px;
       padding-bottom: 5px;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid #222;
     }
 
     .mobile-filter-pills {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
+      gap: 7px;
     }
 
     .mobile-filter-pill {
       background: none;
-      border: 1px solid var(--border2);
-      color: var(--text-dim);
+      border: 1px solid #2a2a2a;
+      color: #555;
       font-family: 'IBM Plex Mono', monospace;
       font-size: 9px;
       letter-spacing: 0.08em;
-      padding: 5px 10px;
+      padding: 6px 12px;
       border-radius: 2px;
       cursor: pointer;
       text-transform: uppercase;
-      transition: all 0.12s;
+      -webkit-tap-highlight-color: transparent;
     }
-    .mobile-filter-pill:hover { color: var(--text); border-color: #444; }
-    .mobile-filter-pill.active { color: var(--accent); border-color: var(--accent); background: #1a1a1a; }
-  }
 
-  /* Hide mobile-only elements on desktop */
-  #filter-toggle { display: none; }
-  #filter-overlay { display: none; }
-  #header-meta { display: contents; }
-  .mobile-meta { display: none; }
+    .mobile-filter-pill.active {
+      color: #e8e8e8;
+      border-color: #e8e8e8;
+      background: #1a1a1a;
+    }
+  }
 </style>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
