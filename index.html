@@ -240,7 +240,65 @@
 
   .sidebar-section { margin-bottom: 18px; }
 
+  /* KEYWORD SEARCH */
+  #keyword-search-wrap {
+    margin-bottom: 18px;
+  }
+
+  #keyword-input {
+    width: 100%;
+    background: #0f0f0f;
+    border: 1px solid var(--border2);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    padding: 5px 8px;
+    outline: none;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+  }
+  #keyword-input::placeholder { color: var(--text-dimmer); }
+  #keyword-input:focus { border-color: #444; }
+
+  #keyword-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 6px;
+    min-height: 0;
+  }
+
+  .keyword-tag {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #161616;
+    border: 1px solid var(--border2);
+    color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.06em;
+    padding: 2px 6px;
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
+
+  .keyword-tag-remove {
+    background: none;
+    border: none;
+    color: var(--text-dimmer);
+    font-size: 10px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    font-family: monospace;
+    transition: color 0.1s;
+  }
+  .keyword-tag-remove:hover { color: var(--red); }
+
   .sidebar-label {
+
     font-size: 8px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -353,6 +411,11 @@ window.logPull = function(count) {
   </div>
 
   <div id="sidebar">
+    <div id="keyword-search-wrap">
+      <div class="sidebar-label">Keywords</div>
+      <input id="keyword-input" type="text" placeholder="type + enter..." spellcheck="false" />
+      <div id="keyword-tags"></div>
+    </div>
     <div class="sidebar-section">
       <div class="sidebar-label">Source</div>
       <button class="filter-btn active" data-src="BBG" onclick="toggleFilter(this,'src')">Bloomberg</button>
@@ -482,7 +545,12 @@ async function loadAll() {
 
 function render() {
   const body = document.getElementById('feed-body');
-  const filtered = allItems.filter(i => activeSources.has(i.src) && activeTopics.has(i.topic));
+  const filtered = allItems.filter(i => {
+    if (!activeSources.has(i.src) || !activeTopics.has(i.topic)) return false;
+    if (activeKeywords.length === 0) return true;
+    const haystack = (i.title + ' ' + i.desc).toLowerCase();
+    return activeKeywords.every(kw => haystack.includes(kw));
+  });
 
   document.getElementById('count').textContent = `${filtered.length} stories`;
 
@@ -560,6 +628,46 @@ function toggleFilter(btn, type) {
       btn.classList.add('active');
     }
   }
+  render();
+}
+
+// ── KEYWORDS ───────────────────────────────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('keyword-input');
+  if (!input) return;
+
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const val = input.value.trim().toLowerCase().replace(/,/g, '');
+      if (val && !activeKeywords.includes(val)) {
+        activeKeywords.push(val);
+        renderKeywordTags();
+        render();
+      }
+      input.value = '';
+    } else if (e.key === 'Backspace' && input.value === '' && activeKeywords.length > 0) {
+      activeKeywords.pop();
+      renderKeywordTags();
+      render();
+    }
+  });
+});
+
+function renderKeywordTags() {
+  const wrap = document.getElementById('keyword-tags');
+  if (!wrap) return;
+  wrap.innerHTML = activeKeywords.map((kw, i) => `
+    <span class="keyword-tag">
+      ${escHtml(kw)}
+      <button class="keyword-tag-remove" onclick="removeKeyword(${i})">×</button>
+    </span>`).join('');
+}
+
+function removeKeyword(i) {
+  activeKeywords.splice(i, 1);
+  renderKeywordTags();
   render();
 }
 
