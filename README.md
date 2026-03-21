@@ -1,6 +1,6 @@
 📡 newsfeed.
 
-news aggregator currently hosted on GitHub Pages. pulls live headlines from a range of trusted news sources and displays them all in one clean, fast, information-dense feed.
+news aggregator currently hosted on GitHub Pages. pulls live 24hr headlines from a range of trusted news sources and displays them all in one clean, fast, information-dense feed.
 
 https://hansenvalueinvesting.github.io/newsfeed/
 
