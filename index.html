@@ -405,21 +405,21 @@ window.logPull = function(count) {
     </div>
     <div class="sidebar-section">
       <div class="sidebar-label">Source</div>
-      <button class="filter-btn" data-src="BBG"  onclick="toggleFilter(this,'src')">Bloomberg</button>
-      <button class="filter-btn" data-src="WSJ"  onclick="toggleFilter(this,'src')">WSJ</button>
-      <button class="filter-btn" data-src="NYT"  onclick="toggleFilter(this,'src')">NYT</button>
-      <button class="filter-btn" data-src="SCMP" onclick="toggleFilter(this,'src')">SCMP</button>
+      <button class="filter-btn active" data-src="BBG"  onclick="toggleFilter(this,'src')">Bloomberg</button>
+      <button class="filter-btn active" data-src="WSJ"  onclick="toggleFilter(this,'src')">WSJ</button>
+      <button class="filter-btn active" data-src="NYT"  onclick="toggleFilter(this,'src')">NYT</button>
+      <button class="filter-btn active" data-src="SCMP" onclick="toggleFilter(this,'src')">SCMP</button>
     </div>
     <div class="sidebar-section">
       <div class="sidebar-label">Topic</div>
-      <button class="filter-btn" data-topic="Economy"  onclick="toggleFilter(this,'topic')">Economy</button>
-      <button class="filter-btn" data-topic="Markets"  onclick="toggleFilter(this,'topic')">Markets</button>
-      <button class="filter-btn" data-topic="Politics" onclick="toggleFilter(this,'topic')">Politics</button>
-      <button class="filter-btn" data-topic="Tech"     onclick="toggleFilter(this,'topic')">Tech</button>
-      <button class="filter-btn" data-topic="Business" onclick="toggleFilter(this,'topic')">Business</button>
-      <button class="filter-btn" data-topic="World"    onclick="toggleFilter(this,'topic')">World</button>
-      <button class="filter-btn" data-topic="China"    onclick="toggleFilter(this,'topic')">China</button>
-      <button class="filter-btn" data-topic="US"       onclick="toggleFilter(this,'topic')">US</button>
+      <button class="filter-btn active" data-topic="Economy"  onclick="toggleFilter(this,'topic')">Economy</button>
+      <button class="filter-btn active" data-topic="Markets"  onclick="toggleFilter(this,'topic')">Markets</button>
+      <button class="filter-btn active" data-topic="Politics" onclick="toggleFilter(this,'topic')">Politics</button>
+      <button class="filter-btn active" data-topic="Tech"     onclick="toggleFilter(this,'topic')">Tech</button>
+      <button class="filter-btn active" data-topic="Business" onclick="toggleFilter(this,'topic')">Business</button>
+      <button class="filter-btn active" data-topic="World"    onclick="toggleFilter(this,'topic')">World</button>
+      <button class="filter-btn active" data-topic="China"    onclick="toggleFilter(this,'topic')">China</button>
+      <button class="filter-btn active" data-topic="US"       onclick="toggleFilter(this,'topic')">US</button>
     </div>
   </div>
 </div>
@@ -459,8 +459,8 @@ const FEEDS = [
 ];
 
 let allItems     = [];
-let activeSources  = new Set();
-let activeTopics   = new Set();
+let activeSources  = new Set(['BBG','WSJ','NYT','SCMP']);
+let activeTopics   = new Set(['Economy','Markets','Politics','Tech','Business','World','China','US']);
 let activeKeywords = [];
 
 // ── FETCH ──────────────────────────────────────────────────────────────────
