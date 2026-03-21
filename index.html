@@ -492,7 +492,7 @@ function parseRSS(xml, feed) {
     div.innerHTML = desc;
     const cleanDesc = div.textContent.trim().slice(0, 280);
     return { title, link, date, desc: cleanDesc, src: feed.src, topic: feed.topic };
-  }).filter(i => i.title && i.date.getFullYear() > 2000);
+  }).filter(i => i.title && i.date.getFullYear() > 2000 && (Date.now() - i.date) < 86400000);
 }
 
 // ── LOAD ALL ───────────────────────────────────────────────────────────────
