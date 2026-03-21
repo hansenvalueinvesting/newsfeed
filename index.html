@@ -633,7 +633,7 @@ function toggleFilter(btn, type) {
 
 // ── KEYWORDS ───────────────────────────────────────────────────────────────
 
-document.addEventListener('DOMContentLoaded', () => {
+function initKeywordInput() {
   const input = document.getElementById('keyword-input');
   if (!input) return;
 
@@ -653,7 +653,7 @@ document.addEventListener('DOMContentLoaded', () => {
       render();
     }
   });
-});
+}
 
 function renderKeywordTags() {
   const wrap = document.getElementById('keyword-tags');
@@ -696,6 +696,7 @@ function escHtml(str) {
 // ── INIT ───────────────────────────────────────────────────────────────────
 
 loadAll();
+initKeywordInput();
 setInterval(loadAll, 5 * 60 * 1000);
 </script>
 </body>
