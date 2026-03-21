@@ -6,8 +6,8 @@ https://hansenvalueinvesting.github.io/newsfeed/
 
 - Displays headlines in a live table with source badges, topic tags, and timestamps color-coded by recency
 - Hover any headline to see a short description without clicking through
-- Filter by source and topic from the sidebar — select as many or as few as you want
+- Filter by keyword, source, and topic from the sidebar — select as many or as few as you want
 - Auto-refreshes every 5 minutes
--  racks a running lifetime count of every article pull across all users
+- Tracks a running lifetime count of every article pull across all users
 
 built by hansen with the help of Claude
