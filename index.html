@@ -21,16 +21,18 @@
     --green: #4ade80;
     --amber: #fbbf24;
     --red: #f87171;
-    --source-bbg: #f97316;
-    --source-wsj: #3b82f6;
-    --source-nyt: #e5e7eb;
-    --topic-markets:   #34d399;
-    --topic-economics: #60a5fa;
-    --topic-politics:  #f472b6;
-    --topic-tech:      #a78bfa;
-    --topic-world:     #fbbf24;
-    --topic-us:        #fb923c;
-    --topic-business:  #38bdf8;
+    --source-bbg:  #f97316;
+    --source-wsj:  #3b82f6;
+    --source-nyt:  #e5e7eb;
+    --source-scmp: #facc15;
+    --topic-markets:  #34d399;
+    --topic-economy:  #60a5fa;
+    --topic-politics: #f472b6;
+    --topic-tech:     #a78bfa;
+    --topic-world:    #fbbf24;
+    --topic-us:       #fb923c;
+    --topic-business: #38bdf8;
+    --topic-china:    #f87171;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -88,13 +90,14 @@
     0%, 100% { opacity: 1; }
     50% { opacity: 0.3; }
   }
-
   @keyframes livepulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.45; }
   }
 
-  #count { margin-left: auto; font-size: 10px; color: var(--text-dim); }
+  #count        { margin-left: auto; font-size: 10px; color: var(--text-dim); }
+  #last-updated { font-size: 10px; color: var(--text-dim); }
+  #lifetime-count { font-size: 10px; color: var(--text-dim); }
 
   #refresh-btn {
     background: none;
@@ -109,9 +112,6 @@
   }
   #refresh-btn:hover { color: var(--accent); }
 
-  #last-updated { font-size: 10px; color: var(--text-dim); }
-  #lifetime-count { font-size: 10px; color: var(--text-dim); }
-
   /* PROGRESS BAR */
   #progress { height: 1px; background: var(--border); overflow: hidden; }
   #progress-bar { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s; }
@@ -121,7 +121,6 @@
 
   /* FEED */
   #feed-wrap { flex: 1; min-width: 0; }
-
   #feed-table { width: 100%; border-collapse: collapse; }
 
   #feed-table thead {
@@ -144,7 +143,7 @@
 
   th.col-time   { width: 80px; }
   th.col-source { width: 120px; }
-  th.col-tag    { width: 80px; }
+  th.col-tag    { width: 100px; }
 
   .feed-row { border-bottom: 1px solid #141414; transition: background 0.1s; }
   .feed-row:hover { background: var(--bg3); }
@@ -165,9 +164,10 @@
     border-radius: 2px;
     text-transform: uppercase;
   }
-  .src-BBG { color: var(--source-bbg); border: 1px solid #3a1f0a; background: #1a0f05; }
-  .src-WSJ { color: var(--source-wsj); border: 1px solid #0e2040; background: #060e1a; }
-  .src-NYT { color: var(--source-nyt); border: 1px solid #2a2a2a; background: #141414; }
+  .src-BBG  { color: var(--source-bbg);  border: 1px solid #3a1f0a; background: #1a0f05; }
+  .src-WSJ  { color: var(--source-wsj);  border: 1px solid #0e2040; background: #060e1a; }
+  .src-NYT  { color: var(--source-nyt);  border: 1px solid #2a2a2a; background: #141414; }
+  .src-SCMP { color: var(--source-scmp); border: 1px solid #3a3000; background: #1a1500; }
 
   .cell-tag { white-space: nowrap; }
 
@@ -179,13 +179,14 @@
     border-radius: 2px;
     text-transform: uppercase;
   }
-  .topic-Markets   { color: var(--topic-markets);   border: 1px solid #0d3326; background: #061a12; }
-  .topic-Economics { color: var(--topic-economics); border: 1px solid #0e2040; background: #060e1a; }
-  .topic-Politics  { color: var(--topic-politics);  border: 1px solid #3d1127; background: #1e0813; }
-  .topic-Tech      { color: var(--topic-tech);      border: 1px solid #2d1f4a; background: #160e24; }
-  .topic-World     { color: var(--topic-world);     border: 1px solid #3d2f0a; background: #1e1705; }
-  .topic-US        { color: var(--topic-us);        border: 1px solid #3d1f0a; background: #1e0f05; }
-  .topic-Business  { color: var(--topic-business);  border: 1px solid #0d2e3d; background: #06151e; }
+  .topic-Economy  { color: var(--topic-economy);  border: 1px solid #0e2040; background: #060e1a; }
+  .topic-Markets  { color: var(--topic-markets);  border: 1px solid #0d3326; background: #061a12; }
+  .topic-Politics { color: var(--topic-politics); border: 1px solid #3d1127; background: #1e0813; }
+  .topic-Tech     { color: var(--topic-tech);     border: 1px solid #2d1f4a; background: #160e24; }
+  .topic-Business { color: var(--topic-business); border: 1px solid #0d2e3d; background: #06151e; }
+  .topic-World    { color: var(--topic-world);    border: 1px solid #3d2f0a; background: #1e1705; }
+  .topic-China    { color: var(--topic-china);    border: 1px solid #3d1010; background: #1e0808; }
+  .topic-US       { color: var(--topic-us);       border: 1px solid #3d1f0a; background: #1e0f05; }
 
   .headline-link {
     color: var(--text);
@@ -238,60 +239,7 @@
     background: var(--bg);
   }
 
-  /* KEYWORD SEARCH */
-  #keyword-search-wrap { margin-bottom: 18px; }
-
-  #keyword-input {
-    width: 100%;
-    background: #0f0f0f;
-    border: 1px solid var(--border2);
-    color: var(--text);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 0.06em;
-    padding: 5px 8px;
-    outline: none;
-    transition: border-color 0.15s;
-    box-sizing: border-box;
-  }
-  #keyword-input::placeholder { color: var(--text-dimmer); }
-  #keyword-input:focus { border-color: #444; }
-
-  #keyword-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-top: 6px;
-  }
-
-  .keyword-tag {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    background: #161616;
-    border: 1px solid var(--border2);
-    color: var(--text-dim);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 8px;
-    letter-spacing: 0.06em;
-    padding: 2px 6px;
-    border-radius: 2px;
-    text-transform: uppercase;
-  }
-
-  .keyword-tag-remove {
-    background: none;
-    border: none;
-    color: var(--text-dimmer);
-    font-size: 10px;
-    cursor: pointer;
-    padding: 0;
-    line-height: 1;
-    transition: color 0.1s;
-  }
-  .keyword-tag-remove:hover { color: var(--red); }
-
-    .sidebar-section { margin-bottom: 18px; }
+  .sidebar-section { margin-bottom: 18px; }
 
   .sidebar-label {
     font-size: 8px;
@@ -303,7 +251,7 @@
     border-bottom: 1px solid var(--border);
   }
 
-  /* FILTER BTN — green dot indicator */
+  /* FILTER BTN */
   .filter-btn {
     display: flex;
     align-items: center;
@@ -336,6 +284,52 @@
   .filter-btn.active { color: var(--text); }
   .filter-btn.active::before { background: var(--green); animation: livepulse 3s ease-in-out infinite; }
 
+  /* KEYWORD SEARCH */
+  #keyword-search-wrap { margin-bottom: 18px; }
+
+  #keyword-input {
+    width: 100%;
+    background: #0f0f0f;
+    border: 1px solid var(--border2);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    padding: 5px 8px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.15s;
+  }
+  #keyword-input::placeholder { color: var(--text-dimmer); }
+  #keyword-input:focus { border-color: #444; }
+
+  #keyword-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+
+  .keyword-tag {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #161616;
+    border: 1px solid var(--border2);
+    color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.06em;
+    padding: 2px 6px;
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
+  .keyword-tag-remove {
+    background: none;
+    border: none;
+    color: var(--text-dimmer);
+    font-size: 10px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    transition: color 0.1s;
+  }
+  .keyword-tag-remove:hover { color: var(--red); }
+
   /* SCROLLBAR */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
@@ -359,14 +353,12 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const countRef = ref(db, 'newsfeed/lifetimeCount');
 
-// Live-sync the displayed counter
 onValue(countRef, snap => {
   const val = snap.val() || 0;
   const el = document.getElementById('lifetime-count');
   if (el) el.textContent = `${val.toLocaleString()} universal lifetime total articles pulled.`;
 });
 
-// Expose increment function for loadAll to call
 window.logPull = function(count) {
   runTransaction(countRef, current => (current || 0) + count);
 };
@@ -413,19 +405,21 @@ window.logPull = function(count) {
     </div>
     <div class="sidebar-section">
       <div class="sidebar-label">Source</div>
-      <button class="filter-btn active" data-src="BBG" onclick="toggleFilter(this,'src')">Bloomberg</button>
-      <button class="filter-btn active" data-src="WSJ" onclick="toggleFilter(this,'src')">WSJ</button>
-      <button class="filter-btn active" data-src="NYT" onclick="toggleFilter(this,'src')">NYT</button>
+      <button class="filter-btn" data-src="BBG"  onclick="toggleFilter(this,'src')">Bloomberg</button>
+      <button class="filter-btn" data-src="WSJ"  onclick="toggleFilter(this,'src')">WSJ</button>
+      <button class="filter-btn" data-src="NYT"  onclick="toggleFilter(this,'src')">NYT</button>
+      <button class="filter-btn" data-src="SCMP" onclick="toggleFilter(this,'src')">SCMP</button>
     </div>
     <div class="sidebar-section">
       <div class="sidebar-label">Topic</div>
-      <button class="filter-btn active" data-topic="Markets"   onclick="toggleFilter(this,'topic')">Markets</button>
-      <button class="filter-btn active" data-topic="Economics" onclick="toggleFilter(this,'topic')">Economics</button>
-      <button class="filter-btn active" data-topic="Politics"  onclick="toggleFilter(this,'topic')">Politics</button>
-      <button class="filter-btn active" data-topic="Tech"      onclick="toggleFilter(this,'topic')">Tech</button>
-      <button class="filter-btn active" data-topic="World"     onclick="toggleFilter(this,'topic')">World</button>
-      <button class="filter-btn active" data-topic="US"        onclick="toggleFilter(this,'topic')">US</button>
-      <button class="filter-btn active" data-topic="Business"  onclick="toggleFilter(this,'topic')">Business</button>
+      <button class="filter-btn" data-topic="Economy"  onclick="toggleFilter(this,'topic')">Economy</button>
+      <button class="filter-btn" data-topic="Markets"  onclick="toggleFilter(this,'topic')">Markets</button>
+      <button class="filter-btn" data-topic="Politics" onclick="toggleFilter(this,'topic')">Politics</button>
+      <button class="filter-btn" data-topic="Tech"     onclick="toggleFilter(this,'topic')">Tech</button>
+      <button class="filter-btn" data-topic="Business" onclick="toggleFilter(this,'topic')">Business</button>
+      <button class="filter-btn" data-topic="World"    onclick="toggleFilter(this,'topic')">World</button>
+      <button class="filter-btn" data-topic="China"    onclick="toggleFilter(this,'topic')">China</button>
+      <button class="filter-btn" data-topic="US"       onclick="toggleFilter(this,'topic')">US</button>
     </div>
   </div>
 </div>
@@ -439,28 +433,35 @@ const CORS_PROXIES = [
 ];
 
 const FEEDS = [
-  { url: 'https://feeds.bloomberg.com/economics/news.rss',                    src: 'BBG', topic: 'Economics' },
-  { url: 'https://feeds.bloomberg.com/markets/news.rss',                      src: 'BBG', topic: 'Markets'   },
-  { url: 'https://feeds.bloomberg.com/politics/news.rss',                     src: 'BBG', topic: 'Politics'  },
-  { url: 'https://feeds.bloomberg.com/technology/news.rss',                   src: 'BBG', topic: 'Tech'      },
-  { url: 'https://feeds.content.dowjones.io/public/rss/socialeconomyfeed',    src: 'WSJ', topic: 'Economics' },
-  { url: 'https://feeds.content.dowjones.io/public/rss/RSSMarketsMain',       src: 'WSJ', topic: 'Markets'   },
-  { url: 'https://feeds.content.dowjones.io/public/rss/socialpoliticsfeed',   src: 'WSJ', topic: 'Politics'  },
-  { url: 'https://feeds.content.dowjones.io/public/rss/RSSWorldNews',         src: 'WSJ', topic: 'World'     },
-  { url: 'https://feeds.content.dowjones.io/public/rss/RSSUSnews',            src: 'WSJ', topic: 'US'        },
-  { url: 'https://feeds.content.dowjones.io/public/rss/WSJcomUSBusiness',     src: 'WSJ', topic: 'Business'  },
-  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/World.xml',            src: 'NYT', topic: 'World'     },
-  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/US.xml',               src: 'NYT', topic: 'US'        },
-  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Politics.xml',         src: 'NYT', topic: 'Politics'  },
-  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Business.xml',         src: 'NYT', topic: 'Business'  },
-  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Economy.xml',          src: 'NYT', topic: 'Economics' },
-  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Dealbook.xml',         src: 'NYT', topic: 'Markets'  },
-  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',       src: 'NYT', topic: 'Tech'      },
+  { url: 'https://feeds.bloomberg.com/economics/news.rss',                  src: 'BBG',  topic: 'Economy'  },
+  { url: 'https://feeds.bloomberg.com/markets/news.rss',                    src: 'BBG',  topic: 'Markets'  },
+  { url: 'https://feeds.bloomberg.com/politics/news.rss',                   src: 'BBG',  topic: 'Politics' },
+  { url: 'https://feeds.bloomberg.com/technology/news.rss',                 src: 'BBG',  topic: 'Tech'     },
+  { url: 'https://feeds.content.dowjones.io/public/rss/socialeconomyfeed',  src: 'WSJ',  topic: 'Economy'  },
+  { url: 'https://feeds.content.dowjones.io/public/rss/RSSMarketsMain',     src: 'WSJ',  topic: 'Markets'  },
+  { url: 'https://feeds.content.dowjones.io/public/rss/socialpoliticsfeed', src: 'WSJ',  topic: 'Politics' },
+  { url: 'https://feeds.content.dowjones.io/public/rss/RSSWorldNews',       src: 'WSJ',  topic: 'World'    },
+  { url: 'https://feeds.content.dowjones.io/public/rss/RSSUSnews',          src: 'WSJ',  topic: 'US'       },
+  { url: 'https://feeds.content.dowjones.io/public/rss/WSJcomUSBusiness',   src: 'WSJ',  topic: 'Business' },
+  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/World.xml',          src: 'NYT',  topic: 'World'    },
+  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/US.xml',             src: 'NYT',  topic: 'US'       },
+  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Politics.xml',       src: 'NYT',  topic: 'Politics' },
+  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Business.xml',       src: 'NYT',  topic: 'Business' },
+  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Economy.xml',        src: 'NYT',  topic: 'Economy'  },
+  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Dealbook.xml',       src: 'NYT',  topic: 'Markets'  },
+  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',     src: 'NYT',  topic: 'Tech'     },
+  { url: 'https://www.scmp.com/rss/91/feed/',                                src: 'SCMP', topic: 'World'    },
+  { url: 'https://www.scmp.com/rss/318198/feed/',                            src: 'SCMP', topic: 'Politics' },
+  { url: 'https://www.scmp.com/rss/318421/feed/',                            src: 'SCMP', topic: 'Economy'  },
+  { url: 'https://www.scmp.com/rss/92/feed/',                                src: 'SCMP', topic: 'Business' },
+  { url: 'https://www.scmp.com/rss/36/feed/',                                src: 'SCMP', topic: 'Tech'     },
+  { url: 'https://www.scmp.com/rss/4/feed',                                  src: 'SCMP', topic: 'China'    },
 ];
 
-let allItems = [];
-let activeSources = new Set(['BBG','WSJ','NYT']);
-let activeTopics  = new Set(['Markets','Economics','Politics','Tech','World','US','Business']);
+let allItems     = [];
+let activeSources  = new Set();
+let activeTopics   = new Set();
+let activeKeywords = [];
 
 // ── FETCH ──────────────────────────────────────────────────────────────────
 
@@ -487,11 +488,9 @@ function parseRSS(xml, feed) {
     const pubDate = item.querySelector('pubDate')?.textContent?.trim() || '';
     const desc    = item.querySelector('description')?.textContent?.trim() || '';
     const date    = pubDate ? new Date(pubDate) : new Date(0);
-
-    const div = document.createElement('div');
+    const div     = document.createElement('div');
     div.innerHTML = desc;
     const cleanDesc = div.textContent.trim().slice(0, 280);
-
     return { title, link, date, desc: cleanDesc, src: feed.src, topic: feed.topic };
   }).filter(i => i.title && i.date.getFullYear() > 2000);
 }
@@ -505,14 +504,12 @@ async function loadAll() {
   const results = [];
   let done = 0;
 
-  const promises = FEEDS.map(async feed => {
+  await Promise.allSettled(FEEDS.map(async feed => {
     const items = await fetchFeed(feed);
     results.push(...items);
     done++;
     setProgress(Math.round((done / FEEDS.length) * 100));
-  });
-
-  await Promise.allSettled(promises);
+  }));
 
   const seen = new Set();
   allItems = results.filter(i => {
@@ -528,9 +525,8 @@ async function loadAll() {
   setProgress(100);
   setTimeout(() => setProgress(0), 600);
 
-  const now = new Date();
   document.getElementById('last-updated').textContent =
-    `updated ${now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false})}`;
+    `updated ${new Date().toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false})}`;
 
   if (window.logPull) window.logPull(results.length);
   render();
@@ -540,6 +536,7 @@ async function loadAll() {
 
 function render() {
   const body = document.getElementById('feed-body');
+
   const filtered = allItems.filter(i => {
     if (!activeSources.has(i.src) || !activeTopics.has(i.topic)) return false;
     if (activeKeywords.length === 0) return true;
@@ -550,7 +547,10 @@ function render() {
   document.getElementById('count').textContent = `${filtered.length} stories`;
 
   if (filtered.length === 0) {
-    body.innerHTML = `<tr id="empty-row"><td colspan="4">NO RESULTS</td></tr>`;
+    const msg = (activeSources.size === 0 || activeTopics.size === 0)
+      ? 'NO FEEDS ACTIVE — SELECT SOURCES AND TOPICS TO BEGIN'
+      : 'NO RESULTS';
+    body.innerHTML = `<tr id="empty-row"><td colspan="4">${msg}</td></tr>`;
     return;
   }
 
@@ -559,7 +559,6 @@ function render() {
     const timeStr = item.date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
     const escapedDesc  = escHtml(item.desc || '—');
     const escapedTitle = escHtml(item.title);
-
     return `<tr class="feed-row">
       <td class="cell-time"><span class="${ageClass}">${timeStr}</span></td>
       <td class="cell-source"><span class="source-badge src-${item.src}">${item.src}</span></td>
@@ -604,25 +603,44 @@ function hideTip() { tip.style.display = 'none'; }
 function toggleFilter(btn, type) {
   if (type === 'src') {
     const val = btn.dataset.src;
-    if (activeSources.has(val)) {
-      if (activeSources.size === 1) return;
-      activeSources.delete(val);
-      btn.classList.remove('active');
-    } else {
-      activeSources.add(val);
-      btn.classList.add('active');
-    }
+    if (activeSources.has(val)) { activeSources.delete(val); btn.classList.remove('active'); }
+    else                        { activeSources.add(val);    btn.classList.add('active');    }
   } else {
     const val = btn.dataset.topic;
-    if (activeTopics.has(val)) {
-      if (activeTopics.size === 1) return;
-      activeTopics.delete(val);
-      btn.classList.remove('active');
-    } else {
-      activeTopics.add(val);
-      btn.classList.add('active');
-    }
+    if (activeTopics.has(val)) { activeTopics.delete(val); btn.classList.remove('active'); }
+    else                       { activeTopics.add(val);    btn.classList.add('active');    }
   }
+  render();
+}
+
+// ── KEYWORDS ───────────────────────────────────────────────────────────────
+
+document.getElementById('keyword-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    const val = this.value.trim().toLowerCase().replace(/,/g, '');
+    if (val && !activeKeywords.includes(val)) {
+      activeKeywords.push(val);
+      renderKeywordTags();
+      render();
+    }
+    this.value = '';
+  } else if (e.key === 'Backspace' && this.value === '' && activeKeywords.length > 0) {
+    activeKeywords.pop();
+    renderKeywordTags();
+    render();
+  }
+});
+
+function renderKeywordTags() {
+  document.getElementById('keyword-tags').innerHTML = activeKeywords.map((kw, i) =>
+    `<span class="keyword-tag">${escHtml(kw)}<button class="keyword-tag-remove" onclick="removeKeyword(${i})">×</button></span>`
+  ).join('');
+}
+
+function removeKeyword(i) {
+  activeKeywords.splice(i, 1);
+  renderKeywordTags();
   render();
 }
 
@@ -648,47 +666,9 @@ function escHtml(str) {
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 }
 
-// ── KEYWORDS ───────────────────────────────────────────────────────────────
-
-function initKeywordInput() {
-  const input = document.getElementById('keyword-input');
-  if (!input) return;
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
-      const val = input.value.trim().toLowerCase().replace(/,/g, '');
-      if (val && !activeKeywords.includes(val)) {
-        activeKeywords.push(val);
-        renderKeywordTags();
-        render();
-      }
-      input.value = '';
-    } else if (e.key === 'Backspace' && input.value === '' && activeKeywords.length > 0) {
-      activeKeywords.pop();
-      renderKeywordTags();
-      render();
-    }
-  });
-}
-
-function renderKeywordTags() {
-  const wrap = document.getElementById('keyword-tags');
-  if (!wrap) return;
-  wrap.innerHTML = activeKeywords.map((kw, i) =>
-    `<span class="keyword-tag">${escHtml(kw)}<button class="keyword-tag-remove" onclick="removeKeyword(${i})">×</button></span>`
-  ).join('');
-}
-
-function removeKeyword(i) {
-  activeKeywords.splice(i, 1);
-  renderKeywordTags();
-  render();
-}
-
 // ── INIT ───────────────────────────────────────────────────────────────────
 
 loadAll();
-initKeywordInput();
 setInterval(loadAll, 5 * 60 * 1000);
 </script>
 </body>
