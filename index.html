@@ -95,7 +95,7 @@
     50% { opacity: 0.45; }
   }
 
-  #count        { margin-left: auto; font-size: 10px; color: var(--text-dim); }
+  #count        { font-size: 10px; color: var(--text-dim); white-space: nowrap; }
   #last-updated { font-size: 10px; color: var(--text-dim); }
   #lifetime-count { font-size: 10px; color: var(--text-dim); }
 
@@ -111,6 +111,35 @@
     transition: color 0.15s;
   }
   #refresh-btn:hover { color: var(--accent); }
+
+
+  /* SPARKLINE */
+  #sparkline-wrap {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+  }
+  #sparkline {
+    display: flex;
+    align-items: flex-end;
+    gap: 1px;
+    height: 18px;
+    width: 100%;
+    overflow: hidden;
+  }
+  .spark-bar {
+    border-radius: 1px 1px 0 0;
+    min-height: 1px;
+    flex-shrink: 0;
+  }
+  #sparkline-now {
+    width: 1px;
+    height: 18px;
+    background: var(--text-dim);
+    opacity: 0.5;
+    flex-shrink: 0;
+  }
 
   /* PROGRESS BAR */
   #progress { height: 1px; background: var(--border); overflow: hidden; }
@@ -374,6 +403,10 @@ window.logPull = function(count) {
   </div>
   <span id="last-updated"></span>
   <span id="lifetime-count"></span>
+  <div id="sparkline-wrap">
+    <div id="sparkline"></div>
+    <div id="sparkline-now"></div>
+  </div>
   <span id="count"></span>
   <button id="refresh-btn" onclick="loadAll()">↺ REFRESH</button>
 </div>
@@ -530,6 +563,7 @@ async function loadAll() {
 
   if (window.logPull) window.logPull(results.length);
   render();
+  renderSparkline();
 }
 
 // ── RENDER ─────────────────────────────────────────────────────────────────
@@ -642,6 +676,64 @@ function removeKeyword(i) {
   activeKeywords.splice(i, 1);
   renderKeywordTags();
   render();
+}
+
+// ── SPARKLINE ──────────────────────────────────────────────────────────────
+
+function renderSparkline() {
+  const wrap = document.getElementById('sparkline');
+  if (!wrap) return;
+
+  // measure available width: each bar is 2px + 1px gap = 3px per bar
+  const BAR_W = 2, GAP = 1, UNIT = BAR_W + GAP;
+  const availW = wrap.offsetWidth;
+  const BUCKETS = Math.max(24, Math.floor(availW / UNIT));
+  const bucketMs = 86400000 / BUCKETS;
+
+  const now = Date.now();
+  const counts = new Array(BUCKETS).fill(0);
+
+  allItems.forEach(item => {
+    const ageMs = now - item.date;
+    if (ageMs < 0 || ageMs >= 86400000) return;
+    const bucket = Math.floor(ageMs / bucketMs);
+    counts[BUCKETS - 1 - bucket]++;
+  });
+
+  const max = Math.max(...counts, 1);
+
+  function bucketColor(i, count) {
+    const t = i / (BUCKETS - 1);
+    const intensity = count / max;
+    if (intensity < 0.05) return '#1a1a1a';
+    let r, g, b;
+    if (t < 0.5) {
+      const s = t * 2;
+      r = Math.round(60  + s * (30  - 60));
+      g = Math.round(30  + s * (180 - 30));
+      b = Math.round(120 + s * (140 - 120));
+    } else {
+      const s = (t - 0.5) * 2;
+      r = Math.round(30  + s * (251 - 30));
+      g = Math.round(180 + s * (191 - 180));
+      b = Math.round(140 + s * (36  - 140));
+    }
+    r = Math.round(r * (0.3 + intensity * 0.7));
+    g = Math.round(g * (0.3 + intensity * 0.7));
+    b = Math.round(b * (0.3 + intensity * 0.7));
+    return `rgb(${r},${g},${b})`;
+  }
+
+  const intervalMins = Math.round(bucketMs / 60000);
+  wrap.innerHTML = counts.map((c, i) => {
+    const pct = Math.max(Math.round((c / max) * 100), c > 0 ? 5 : 2);
+    const color = bucketColor(i, c);
+    const agoMins = Math.round(((BUCKETS - 1 - i) / BUCKETS) * 1440);
+    const label = agoMins < 60
+      ? `${agoMins}m ago · ${c} articles`
+      : `${Math.floor(agoMins/60)}h${agoMins%60 ? (agoMins%60)+'m' : ''} ago · ${c} articles`;
+    return `<div class="spark-bar" style="height:${pct}%;width:${BAR_W}px;background:${color}" title="${label}"></div>`;
+  }).join('');
 }
 
 // ── HELPERS ────────────────────────────────────────────────────────────────
