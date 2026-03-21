@@ -291,6 +291,153 @@
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
+
+  /* ── MOBILE ────────────────────────────────────────────────────────────── */
+  @media (max-width: 768px) {
+
+    /* Header wraps to two lines */
+    #header {
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 8px 12px;
+    }
+
+    #wordmark { font-size: 10px; }
+
+    /* Push filter toggle to far right on first row */
+    #filter-toggle {
+      display: flex;
+      margin-left: auto;
+    }
+
+    /* Second row: status + meta info */
+    #header-meta {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    #count { margin-left: auto; }
+
+    /* Hide desktop sidebar */
+    #sidebar { display: none; }
+
+    /* Feed takes full width */
+    #feed-wrap { width: 100%; }
+
+    /* Hide TIME and TOPIC columns */
+    .col-time, .col-tag,
+    .cell-time, .cell-tag { display: none; }
+
+    /* Tighten rows */
+    .feed-row td { padding: 8px 10px; }
+
+    /* Headline cell: stack source + headline + time */
+    .cell-headline { display: flex; flex-direction: column; gap: 3px; }
+
+    .headline-link {
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .mobile-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    /* Source col stays but tighter */
+    th.col-source { width: 70px; }
+    .cell-source { vertical-align: top; padding-top: 10px; }
+
+    /* Filter overlay */
+    #filter-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 200;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    #filter-overlay.open { display: flex; }
+
+    #filter-sheet {
+      background: #111;
+      border-top: 1px solid var(--border);
+      padding: 20px 16px 32px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    #filter-sheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    #filter-sheet-title {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    #filter-close {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+    #filter-close:hover { color: var(--accent); }
+
+    .mobile-filter-group { margin-bottom: 20px; }
+
+    .mobile-filter-label {
+      font-size: 8px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-dimmer);
+      margin-bottom: 8px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .mobile-filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .mobile-filter-pill {
+      background: none;
+      border: 1px solid var(--border2);
+      color: var(--text-dim);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      padding: 5px 10px;
+      border-radius: 2px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.12s;
+    }
+    .mobile-filter-pill:hover { color: var(--text); border-color: #444; }
+    .mobile-filter-pill.active { color: var(--accent); border-color: var(--accent); background: #1a1a1a; }
+  }
+
+  /* Hide mobile-only elements on desktop */
+  #filter-toggle { display: none; }
+  #filter-overlay { display: none; }
+  #header-meta { display: contents; }
+  .mobile-meta { display: none; }
 </style>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -499,7 +646,7 @@ function render() {
   document.getElementById('count').textContent = `${filtered.length} stories`;
 
   if (filtered.length === 0) {
-    body.innerHTML = `<tr id="empty-row"><td colspan="4">NO FEEDS ACTIVE — SELECT SOURCES AND TOPICS FROM THE MENU ON THE RIGHT</td></tr>`;
+    body.innerHTML = `<tr id="empty-row"><td colspan="4">NO FEEDS ACTIVE — SELECT SOURCES AND TOPICS TO BEGIN</td></tr>`;
     return;
   }
 
@@ -520,6 +667,10 @@ function render() {
            onmousemove="moveTip(event)"
            onmouseleave="hideTip()"
         >${escapedTitle}</a>
+        <div class="mobile-meta">
+          <span class="topic-badge topic-${item.topic}">${item.topic}</span>
+          <span class="${ageClass}" style="font-size:9px">${timeStr}</span>
+        </div>
       </td>
     </tr>`;
   }).join('');
@@ -554,25 +705,42 @@ function toggleFilter(btn, type) {
   if (type === 'src') {
     const val = btn.dataset.src;
     if (activeSources.has(val)) {
-      if (activeSources.size === 1) return;
       activeSources.delete(val);
       btn.classList.remove('active');
     } else {
       activeSources.add(val);
       btn.classList.add('active');
     }
+    // sync counterpart buttons (desktop sidebar <-> mobile overlay)
+    document.querySelectorAll(`[data-src="${val}"]`).forEach(b => {
+      b.classList.toggle('active', activeSources.has(val));
+    });
   } else {
     const val = btn.dataset.topic;
     if (activeTopics.has(val)) {
-      if (activeTopics.size === 1) return;
       activeTopics.delete(val);
       btn.classList.remove('active');
     } else {
       activeTopics.add(val);
       btn.classList.add('active');
     }
+    document.querySelectorAll(`[data-topic="${val}"]`).forEach(b => {
+      b.classList.toggle('active', activeTopics.has(val));
+    });
   }
   render();
+}
+
+function openFilterOverlay() {
+  document.getElementById('filter-overlay').classList.add('open');
+}
+
+function closeFilterOverlay() {
+  document.getElementById('filter-overlay').classList.remove('open');
+}
+
+function overlayBgClick(e) {
+  if (e.target === document.getElementById('filter-overlay')) closeFilterOverlay();
 }
 
 // ── HELPERS ────────────────────────────────────────────────────────────────
@@ -602,5 +770,36 @@ function escHtml(str) {
 loadAll();
 setInterval(loadAll, 5 * 60 * 1000);
 </script>
+
+<div id="filter-overlay" onclick="overlayBgClick(event)">
+  <div id="filter-sheet">
+    <div id="filter-sheet-header">
+      <span id="filter-sheet-title">Filters</span>
+      <button id="filter-close" onclick="closeFilterOverlay()">✕</button>
+    </div>
+    <div class="mobile-filter-group">
+      <div class="mobile-filter-label">Source</div>
+      <div class="mobile-filter-pills">
+        <button class="mobile-filter-pill" data-src="BBG"  onclick="toggleFilter(this,'src')">Bloomberg</button>
+        <button class="mobile-filter-pill" data-src="WSJ"  onclick="toggleFilter(this,'src')">WSJ</button>
+        <button class="mobile-filter-pill" data-src="NYT"  onclick="toggleFilter(this,'src')">NYT</button>
+        <button class="mobile-filter-pill" data-src="SCMP" onclick="toggleFilter(this,'src')">SCMP</button>
+      </div>
+    </div>
+    <div class="mobile-filter-group">
+      <div class="mobile-filter-label">Topic</div>
+      <div class="mobile-filter-pills">
+        <button class="mobile-filter-pill" data-topic="Economy"  onclick="toggleFilter(this,'topic')">Economy</button>
+        <button class="mobile-filter-pill" data-topic="Markets"  onclick="toggleFilter(this,'topic')">Markets</button>
+        <button class="mobile-filter-pill" data-topic="Politics" onclick="toggleFilter(this,'topic')">Politics</button>
+        <button class="mobile-filter-pill" data-topic="Tech"     onclick="toggleFilter(this,'topic')">Tech</button>
+        <button class="mobile-filter-pill" data-topic="Business" onclick="toggleFilter(this,'topic')">Business</button>
+        <button class="mobile-filter-pill" data-topic="World"    onclick="toggleFilter(this,'topic')">World</button>
+        <button class="mobile-filter-pill" data-topic="China"    onclick="toggleFilter(this,'topic')">China</button>
+        <button class="mobile-filter-pill" data-topic="US"       onclick="toggleFilter(this,'topic')">US</button>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
