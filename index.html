@@ -238,12 +238,8 @@
     background: var(--bg);
   }
 
-  .sidebar-section { margin-bottom: 18px; }
-
   /* KEYWORD SEARCH */
-  #keyword-search-wrap {
-    margin-bottom: 18px;
-  }
+  #keyword-search-wrap { margin-bottom: 18px; }
 
   #keyword-input {
     width: 100%;
@@ -266,7 +262,6 @@
     flex-wrap: wrap;
     gap: 4px;
     margin-top: 6px;
-    min-height: 0;
   }
 
   .keyword-tag {
@@ -292,13 +287,13 @@
     cursor: pointer;
     padding: 0;
     line-height: 1;
-    font-family: monospace;
     transition: color 0.1s;
   }
   .keyword-tag-remove:hover { color: var(--red); }
 
-  .sidebar-label {
+    .sidebar-section { margin-bottom: 18px; }
 
+  .sidebar-label {
     font-size: 8px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -631,12 +626,33 @@ function toggleFilter(btn, type) {
   render();
 }
 
+// ── HELPERS ────────────────────────────────────────────────────────────────
+
+function setStatus(state, text) {
+  document.getElementById('status-dot').className = state;
+  document.getElementById('status-text').textContent = text;
+}
+
+function setProgress(pct) {
+  document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+function formatAge(date) {
+  const mins = Math.floor((Date.now() - date) / 60000);
+  if (mins < 30)  return { ageClass: 'age-fresh'  };
+  if (mins < 180) return { ageClass: 'age-recent' };
+  return { ageClass: 'age-old' };
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+
 // ── KEYWORDS ───────────────────────────────────────────────────────────────
 
 function initKeywordInput() {
   const input = document.getElementById('keyword-input');
   if (!input) return;
-
   input.addEventListener('keydown', e => {
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
@@ -658,39 +674,15 @@ function initKeywordInput() {
 function renderKeywordTags() {
   const wrap = document.getElementById('keyword-tags');
   if (!wrap) return;
-  wrap.innerHTML = activeKeywords.map((kw, i) => `
-    <span class="keyword-tag">
-      ${escHtml(kw)}
-      <button class="keyword-tag-remove" onclick="removeKeyword(${i})">×</button>
-    </span>`).join('');
+  wrap.innerHTML = activeKeywords.map((kw, i) =>
+    `<span class="keyword-tag">${escHtml(kw)}<button class="keyword-tag-remove" onclick="removeKeyword(${i})">×</button></span>`
+  ).join('');
 }
 
 function removeKeyword(i) {
   activeKeywords.splice(i, 1);
   renderKeywordTags();
   render();
-}
-
-// ── HELPERS ────────────────────────────────────────────────────────────────
-
-function setStatus(state, text) {
-  document.getElementById('status-dot').className = state;
-  document.getElementById('status-text').textContent = text;
-}
-
-function setProgress(pct) {
-  document.getElementById('progress-bar').style.width = pct + '%';
-}
-
-function formatAge(date) {
-  const mins = Math.floor((Date.now() - date) / 60000);
-  if (mins < 30)  return { ageClass: 'age-fresh'  };
-  if (mins < 180) return { ageClass: 'age-recent' };
-  return { ageClass: 'age-old' };
-}
-
-function escHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 }
 
 // ── INIT ───────────────────────────────────────────────────────────────────
