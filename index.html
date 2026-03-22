@@ -19,11 +19,11 @@
   window._analyticsTransaction = runTransaction;
 </script>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>newsfeed.</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap');
 
   :root {
     --bg: #0a0a0a;
@@ -50,9 +50,11 @@
     --topic-us:       #fb923c;
     --topic-business: #38bdf8;
     --topic-china:    #f87171;
+    --header-h: 40px;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
   body {
     background: var(--bg);
@@ -61,9 +63,11 @@
     font-size: 11px;
     line-height: 1.4;
     min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
   }
 
-  /* HEADER */
+  /* ── HEADER ─────────────────────────────────────────── */
   #header {
     position: sticky;
     top: 0;
@@ -73,7 +77,8 @@
     padding: 8px 16px;
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: 16px;
+    height: var(--header-h);
   }
 
   #wordmark {
@@ -82,6 +87,7 @@
     letter-spacing: 0.2em;
     color: var(--accent);
     text-transform: uppercase;
+    white-space: nowrap;
   }
 
   #status {
@@ -90,52 +96,44 @@
     display: flex;
     align-items: center;
     gap: 6px;
+    white-space: nowrap;
   }
 
   #status-dot {
-    width: 5px;
-    height: 5px;
+    width: 5px; height: 5px;
     border-radius: 50%;
     background: var(--text-dimmer);
     transition: background 0.3s;
+    flex-shrink: 0;
   }
   #status-dot.loading { background: var(--amber); animation: pulse 1s infinite; }
   #status-dot.live    { background: var(--green); animation: livepulse 3s ease-in-out infinite; }
   #status-dot.error   { background: var(--red); }
 
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-  @keyframes livepulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.45; }
-  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  @keyframes livepulse { 0%,100%{opacity:1} 50%{opacity:0.45} }
 
-  #count        { font-size: 10px; color: var(--text-dim); white-space: nowrap; }
-  #last-updated { font-size: 10px; color: var(--text-dim); }
-  #lifetime-count { font-size: 10px; color: var(--text-dim); }
-
-  #refresh-btn {
-    background: none;
-    border: none;
-    color: var(--text-dim);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    cursor: pointer;
-    padding: 2px 6px;
-    letter-spacing: 0.1em;
-    transition: color 0.15s;
-  }
-  #refresh-btn:hover { color: var(--accent); }
-
-
-  /* SPARKLINE */
-  #sparkline-wrap {
+  #header-meta {
     display: flex;
     align-items: center;
+    gap: 12px;
     flex: 1;
     min-width: 0;
+    justify-content: flex-end;
+  }
+
+  #count, #last-updated, #lifetime-count {
+    font-size: 10px;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+
+  #sparkline-wrap {
+    display: flex;
+    align-items: flex-end;
+    flex: 1;
+    min-width: 0;
+    max-width: 300px;
   }
   #sparkline {
     display: flex;
@@ -150,32 +148,41 @@
     min-height: 1px;
     flex-shrink: 0;
   }
-  #sparkline-now {
-    width: 1px;
-    height: 18px;
-    background: var(--text-dim);
-    opacity: 0.5;
-    flex-shrink: 0;
-  }
 
-  /* PROGRESS BAR */
+  #refresh-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    cursor: pointer;
+    padding: 6px 8px;
+    letter-spacing: 0.1em;
+    transition: color 0.15s;
+    white-space: nowrap;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+  }
+  #refresh-btn:hover { color: var(--accent); }
+
+  /* ── PROGRESS ───────────────────────────────────────── */
   #progress { height: 1px; background: var(--border); overflow: hidden; }
   #progress-bar { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s; }
 
-  /* LAYOUT */
+  /* ── LAYOUT ─────────────────────────────────────────── */
   #body-layout { display: flex; align-items: flex-start; }
-
-  /* FEED */
   #feed-wrap { flex: 1; min-width: 0; }
+
+  /* ── FEED TABLE (desktop) ───────────────────────────── */
   #feed-table { width: 100%; border-collapse: collapse; }
 
   #feed-table thead {
     position: sticky;
-    top: 37px;
+    top: var(--header-h);
     z-index: 98;
     background: var(--bg2);
   }
-
   #feed-table thead th {
     padding: 5px 16px;
     text-align: left;
@@ -186,7 +193,6 @@
     color: var(--text-dimmer);
     border-bottom: 1px solid var(--border);
   }
-
   th.col-time   { width: 80px; }
   th.col-source { width: 120px; }
   th.col-tag    { width: 100px; }
@@ -203,12 +209,9 @@
   .cell-source { white-space: nowrap; }
 
   .source-badge {
-    font-size: 9px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    padding: 1px 5px;
-    border-radius: 2px;
-    text-transform: uppercase;
+    font-size: 9px; font-weight: 500;
+    letter-spacing: 0.08em; padding: 1px 5px;
+    border-radius: 2px; text-transform: uppercase;
   }
   .src-BBG  { color: var(--source-bbg);  border: 1px solid #3a1f0a; background: #1a0f05; }
   .src-WSJ  { color: var(--source-wsj);  border: 1px solid #0e2040; background: #060e1a; }
@@ -218,12 +221,9 @@
   .cell-tag { white-space: nowrap; }
 
   .topic-badge {
-    font-size: 9px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    padding: 1px 5px;
-    border-radius: 2px;
-    text-transform: uppercase;
+    font-size: 9px; font-weight: 500;
+    letter-spacing: 0.08em; padding: 1px 5px;
+    border-radius: 2px; text-transform: uppercase;
   }
   .topic-Economy  { color: var(--topic-economy);  border: 1px solid #0e2040; background: #060e1a; }
   .topic-Markets  { color: var(--topic-markets);  border: 1px solid #0d3326; background: #061a12; }
@@ -238,14 +238,13 @@
     color: var(--text);
     text-decoration: none;
     font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 12px;
-    font-weight: 300;
+    font-size: 12px; font-weight: 300;
     line-height: 1.3;
     transition: color 0.1s;
   }
   .headline-link:hover { color: var(--accent); }
 
-  /* TOOLTIP */
+  /* ── TOOLTIP (desktop only) ─────────────────────────── */
   .tooltip {
     display: none;
     position: fixed;
@@ -255,15 +254,14 @@
     padding: 10px 14px;
     max-width: 420px;
     font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 11px;
-    font-weight: 300;
+    font-size: 11px; font-weight: 300;
     color: #aaa;
     line-height: 1.5;
     pointer-events: none;
     box-shadow: 0 8px 32px rgba(0,0,0,0.6);
   }
 
-  /* EMPTY / LOADING */
+  /* ── EMPTY / LOADING ────────────────────────────────── */
   #loading-row td, #empty-row td {
     padding: 40px 16px;
     color: var(--text-dimmer);
@@ -272,15 +270,15 @@
     letter-spacing: 0.1em;
   }
 
-  /* SIDEBAR */
+  /* ── SIDEBAR (desktop) ──────────────────────────────── */
   #sidebar {
     width: 160px;
     flex-shrink: 0;
     border-left: 1px solid var(--border);
     padding: 14px 12px;
     position: sticky;
-    top: 37px;
-    height: calc(100vh - 37px);
+    top: var(--header-h);
+    height: calc(100vh - var(--header-h));
     overflow-y: auto;
     background: var(--bg);
   }
@@ -297,7 +295,6 @@
     border-bottom: 1px solid var(--border);
   }
 
-  /* FILTER BTN */
   .filter-btn {
     display: flex;
     align-items: center;
@@ -318,8 +315,7 @@
   .filter-btn::before {
     content: '';
     display: inline-block;
-    width: 5px;
-    height: 5px;
+    width: 5px; height: 5px;
     border-radius: 50%;
     flex-shrink: 0;
     background: var(--text-dimmer);
@@ -330,9 +326,8 @@
   .filter-btn.active { color: var(--text); }
   .filter-btn.active::before { background: var(--green); animation: livepulse 3s ease-in-out infinite; }
 
-  /* KEYWORD SEARCH */
+  /* ── KEYWORD SEARCH ─────────────────────────────────── */
   #keyword-search-wrap { margin-bottom: 18px; }
-
   #keyword-input {
     width: 100%;
     background: #0f0f0f;
@@ -342,12 +337,10 @@
     font-size: 9px;
     padding: 5px 8px;
     outline: none;
-    box-sizing: border-box;
     transition: border-color 0.15s;
   }
   #keyword-input::placeholder { color: var(--text-dimmer); }
   #keyword-input:focus { border-color: #444; }
-
   #keyword-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
 
   .keyword-tag {
@@ -365,8 +358,7 @@
     text-transform: uppercase;
   }
   .keyword-tag-remove {
-    background: none;
-    border: none;
+    background: none; border: none;
     color: var(--text-dimmer);
     font-size: 10px;
     cursor: pointer;
@@ -376,10 +368,277 @@
   }
   .keyword-tag-remove:hover { color: var(--red); }
 
-  /* SCROLLBAR */
+  /* ── MOBILE FILTER FAB ──────────────────────────────── */
+  #filter-fab {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 16px;
+    z-index: 200;
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    border: 1px solid var(--border2);
+    color: var(--text-dim);
+    font-size: 18px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    transition: background 0.15s, border-color 0.15s;
+    padding-bottom: var(--safe-bottom);
+  }
+  #filter-fab:active { background: #252525; border-color: #444; }
+  #filter-fab .fab-count {
+    position: absolute;
+    top: -4px; right: -4px;
+    background: var(--green);
+    color: #000;
+    font-size: 8px;
+    font-weight: 500;
+    min-width: 16px; height: 16px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* ── MOBILE DRAWER ──────────────────────────────────── */
+  #drawer-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: rgba(0,0,0,0.6);
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  #drawer-overlay.open { opacity: 1; }
+
+  #drawer {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 301;
+    background: var(--bg2);
+    border-top: 1px solid var(--border2);
+    border-radius: 12px 12px 0 0;
+    max-height: 70vh;
+    max-height: 70dvh;
+    overflow-y: auto;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    padding-bottom: var(--safe-bottom);
+    display: none;
+  }
+  #drawer.open { transform: translateY(0); }
+
+  #drawer-handle {
+    display: flex;
+    justify-content: center;
+    padding: 10px 0 6px;
+    position: sticky;
+    top: 0;
+    background: var(--bg2);
+    z-index: 1;
+  }
+  #drawer-handle::after {
+    content: '';
+    width: 36px; height: 4px;
+    border-radius: 2px;
+    background: #333;
+  }
+
+  #drawer-content { padding: 8px 16px 24px; }
+
+  .drawer-section-label {
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-dimmer);
+    margin-bottom: 10px;
+    margin-top: 16px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--border);
+  }
+  .drawer-section-label:first-child { margin-top: 0; }
+
+  .drawer-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .drawer-chip {
+    background: #0f0f0f;
+    border: 1px solid var(--border2);
+    color: var(--text-dimmer);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    padding: 8px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.15s;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .drawer-chip.active {
+    color: var(--accent);
+    border-color: #444;
+    background: #1a1a1a;
+  }
+  .drawer-chip.active::before {
+    content: '● ';
+    color: var(--green);
+    font-size: 8px;
+  }
+
+  #drawer-keyword-input {
+    width: 100%;
+    background: #0a0a0a;
+    border: 1px solid var(--border2);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    padding: 10px 12px;
+    outline: none;
+    border-radius: 4px;
+    transition: border-color 0.15s;
+    margin-top: 10px;
+  }
+  #drawer-keyword-input::placeholder { color: var(--text-dimmer); }
+  #drawer-keyword-input:focus { border-color: #444; }
+
+  #drawer-keyword-tags {
+    display: flex; flex-wrap: wrap;
+    gap: 6px; margin-top: 8px;
+  }
+  .drawer-keyword-tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #161616;
+    border: 1px solid var(--border2);
+    color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    padding: 5px 10px;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+  .drawer-keyword-tag button {
+    background: none; border: none;
+    color: var(--text-dimmer);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+  }
+
+  /* ── MOBILE CARD LAYOUT ─────────────────────────────── */
+  #card-feed {
+    display: none;
+    padding: 0;
+  }
+
+  .feed-card {
+    display: block;
+    padding: 14px 16px;
+    border-bottom: 1px solid #141414;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.1s;
+  }
+  .feed-card:active { background: var(--bg3); }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .card-meta .source-badge,
+  .card-meta .topic-badge {
+    font-size: 9px;
+  }
+  .card-time {
+    font-size: 10px;
+    font-variant-numeric: tabular-nums;
+    margin-left: auto;
+  }
+  .card-headline {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--text);
+  }
+  .card-desc {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 300;
+    line-height: 1.45;
+    color: var(--text-dim);
+    margin-top: 5px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  #card-empty, #card-loading {
+    padding: 60px 16px;
+    color: var(--text-dimmer);
+    font-size: 10px;
+    text-align: center;
+    letter-spacing: 0.1em;
+  }
+
+  /* ── SCROLLBAR ──────────────────────────────────────── */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
+
+  /* ══════════════════════════════════════════════════════
+     RESPONSIVE — MOBILE BREAKPOINT
+     ══════════════════════════════════════════════════════ */
+  @media (max-width: 680px) {
+    :root { --header-h: auto; }
+
+    #header {
+      flex-wrap: wrap;
+      gap: 6px 12px;
+      padding: 8px 12px;
+    }
+
+    /* hide desktop-only items on mobile */
+    #sparkline-wrap,
+    #last-updated,
+    #lifetime-count { display: none; }
+
+    #header-meta { gap: 8px; }
+
+    /* hide desktop table and sidebar */
+    #feed-table, #sidebar { display: none; }
+
+    /* show mobile card feed */
+    #card-feed { display: block; }
+
+    /* show filter FAB */
+    #filter-fab { display: flex; }
+
+    .card-headline { font-size: 13px; }
+  }
+
+  /* tablet tweaks */
+  @media (min-width: 681px) and (max-width: 900px) {
+    #sidebar { width: 140px; }
+    th.col-source { width: 90px; }
+    th.col-tag { width: 80px; }
+    .headline-link { font-size: 11px; }
+  }
 </style>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -402,7 +661,7 @@ const countRef = ref(db, 'newsfeed/lifetimeCount');
 onValue(countRef, snap => {
   const val = snap.val() || 0;
   const el = document.getElementById('lifetime-count');
-  if (el) el.textContent = `${val.toLocaleString()} universal lifetime total articles pulled.`;
+  if (el) el.textContent = `${val.toLocaleString()} lifetime pulls`;
 });
 
 window.logPull = function(count) {
@@ -418,20 +677,22 @@ window.logPull = function(count) {
     <div id="status-dot"></div>
     <span id="status-text">IDLE</span>
   </div>
-  <span id="last-updated"></span>
-  <span id="lifetime-count"></span>
-  <div id="sparkline-wrap">
-    <div id="sparkline"></div>
-    <div id="sparkline-now"></div>
+  <div id="header-meta">
+    <span id="last-updated"></span>
+    <span id="lifetime-count"></span>
+    <div id="sparkline-wrap">
+      <div id="sparkline"></div>
+    </div>
+    <span id="count"></span>
+    <button id="refresh-btn" onclick="loadAll()">↺ REFRESH</button>
   </div>
-  <span id="count"></span>
-  <button id="refresh-btn" onclick="loadAll()">↺ REFRESH</button>
 </div>
 
 <div id="progress"><div id="progress-bar"></div></div>
 
 <div id="body-layout">
   <div id="feed-wrap">
+    <!-- Desktop: table view -->
     <table id="feed-table">
       <thead>
         <tr>
@@ -445,8 +706,14 @@ window.logPull = function(count) {
         <tr id="loading-row"><td colspan="4">INITIALIZING...</td></tr>
       </tbody>
     </table>
+
+    <!-- Mobile: card view -->
+    <div id="card-feed">
+      <div id="card-loading">INITIALIZING...</div>
+    </div>
   </div>
 
+  <!-- Desktop sidebar -->
   <div id="sidebar">
     <div id="keyword-search-wrap">
       <div class="sidebar-label">Keywords</div>
@@ -471,6 +738,29 @@ window.logPull = function(count) {
       <button class="filter-btn active" data-topic="China"    onclick="toggleFilter(this,'topic')">China</button>
       <button class="filter-btn active" data-topic="US"       onclick="toggleFilter(this,'topic')">US</button>
     </div>
+  </div>
+</div>
+
+<!-- Mobile filter FAB -->
+<button id="filter-fab" onclick="openDrawer()">
+  ⚙
+  <span class="fab-count" id="fab-count" style="display:none"></span>
+</button>
+
+<!-- Mobile filter drawer -->
+<div id="drawer-overlay" onclick="closeDrawer()"></div>
+<div id="drawer">
+  <div id="drawer-handle"></div>
+  <div id="drawer-content">
+    <div class="drawer-section-label">Keywords</div>
+    <input id="drawer-keyword-input" type="text" placeholder="type + enter to add keyword..." spellcheck="false" />
+    <div id="drawer-keyword-tags"></div>
+
+    <div class="drawer-section-label">Source</div>
+    <div class="drawer-chips" id="drawer-src-chips"></div>
+
+    <div class="drawer-section-label">Topic</div>
+    <div class="drawer-chips" id="drawer-topic-chips"></div>
   </div>
 </div>
 
@@ -508,12 +798,130 @@ const FEEDS = [
   { url: 'https://www.scmp.com/rss/4/feed',                                  src: 'SCMP', topic: 'China'    },
 ];
 
-let allItems     = [];
+let allItems       = [];
 let activeSources  = new Set(['BBG','WSJ','NYT','SCMP']);
 let activeTopics   = new Set(['Economy','Markets','Politics','Tech','Business','World','China','US']);
 let activeKeywords = [];
 
-// ── FETCH ──────────────────────────────────────────────────────────────────
+const isMobile = () => window.innerWidth <= 680;
+
+// ── DRAWER ─────────────────────────────────────────────
+
+function buildDrawerChips() {
+  const srcWrap   = document.getElementById('drawer-src-chips');
+  const topicWrap = document.getElementById('drawer-topic-chips');
+
+  srcWrap.innerHTML = ['BBG','WSJ','NYT','SCMP'].map(s =>
+    `<button class="drawer-chip ${activeSources.has(s)?'active':''}" data-src="${s}" onclick="toggleDrawerChip(this,'src')">${s}</button>`
+  ).join('');
+
+  topicWrap.innerHTML = ['Economy','Markets','Politics','Tech','Business','World','China','US'].map(t =>
+    `<button class="drawer-chip ${activeTopics.has(t)?'active':''}" data-topic="${t}" onclick="toggleDrawerChip(this,'topic')">${t}</button>`
+  ).join('');
+}
+
+function toggleDrawerChip(btn, type) {
+  if (type === 'src') {
+    const val = btn.dataset.src;
+    if (activeSources.has(val)) { activeSources.delete(val); btn.classList.remove('active'); }
+    else { activeSources.add(val); btn.classList.add('active'); }
+  } else {
+    const val = btn.dataset.topic;
+    if (activeTopics.has(val)) { activeTopics.delete(val); btn.classList.remove('active'); }
+    else { activeTopics.add(val); btn.classList.add('active'); }
+  }
+  syncDesktopFilters();
+  updateFabCount();
+  render();
+}
+
+function syncDesktopFilters() {
+  document.querySelectorAll('#sidebar .filter-btn[data-src]').forEach(btn => {
+    btn.classList.toggle('active', activeSources.has(btn.dataset.src));
+  });
+  document.querySelectorAll('#sidebar .filter-btn[data-topic]').forEach(btn => {
+    btn.classList.toggle('active', activeTopics.has(btn.dataset.topic));
+  });
+}
+
+function updateFabCount() {
+  const totalFilters = 4 + 8; // all sources + all topics
+  const activeCount  = activeSources.size + activeTopics.size + activeKeywords.length;
+  const inactive     = totalFilters - activeSources.size - activeTopics.size;
+  const el = document.getElementById('fab-count');
+  if (inactive > 0 || activeKeywords.length > 0) {
+    el.style.display = 'flex';
+    el.textContent = activeKeywords.length > 0 ? activeKeywords.length + inactive : inactive;
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+function openDrawer() {
+  buildDrawerChips();
+  renderDrawerKeywords();
+  const overlay = document.getElementById('drawer-overlay');
+  const drawer  = document.getElementById('drawer');
+  overlay.style.display = 'block';
+  drawer.style.display  = 'block';
+  requestAnimationFrame(() => {
+    overlay.classList.add('open');
+    drawer.classList.add('open');
+  });
+}
+
+function closeDrawer() {
+  const overlay = document.getElementById('drawer-overlay');
+  const drawer  = document.getElementById('drawer');
+  overlay.classList.remove('open');
+  drawer.classList.remove('open');
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    drawer.style.display  = 'none';
+  }, 300);
+}
+
+// Drawer keyword support
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('drawer-keyword-input')?.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const val = this.value.trim().toLowerCase().replace(/,/g, '');
+      if (val && !activeKeywords.includes(val)) {
+        activeKeywords.push(val);
+        renderDrawerKeywords();
+        renderKeywordTags();
+        updateFabCount();
+        render();
+      }
+      this.value = '';
+    } else if (e.key === 'Backspace' && this.value === '' && activeKeywords.length > 0) {
+      activeKeywords.pop();
+      renderDrawerKeywords();
+      renderKeywordTags();
+      updateFabCount();
+      render();
+    }
+  });
+});
+
+function renderDrawerKeywords() {
+  const wrap = document.getElementById('drawer-keyword-tags');
+  if (!wrap) return;
+  wrap.innerHTML = activeKeywords.map((kw, i) =>
+    `<span class="drawer-keyword-tag">${escHtml(kw)}<button onclick="removeKeywordFromDrawer(${i})">×</button></span>`
+  ).join('');
+}
+
+function removeKeywordFromDrawer(i) {
+  activeKeywords.splice(i, 1);
+  renderDrawerKeywords();
+  renderKeywordTags();
+  updateFabCount();
+  render();
+}
+
+// ── FETCH ──────────────────────────────────────────────
 
 async function fetchFeed(feed, proxyIdx = 0) {
   if (proxyIdx >= CORS_PROXIES.length) return [];
@@ -545,7 +953,7 @@ function parseRSS(xml, feed) {
   }).filter(i => i.title && i.date.getFullYear() > 2000 && (Date.now() - i.date) < 86400000);
 }
 
-// ── LOAD ALL ───────────────────────────────────────────────────────────────
+// ── LOAD ALL ───────────────────────────────────────────
 
 async function loadAll() {
   setStatus('loading', 'FETCHING');
@@ -571,7 +979,7 @@ async function loadAll() {
 
   allItems.sort((a, b) => b.date - a.date);
 
-  setStatus('live', `LIVE · ${allItems.length} items`);
+  setStatus('live', `LIVE · ${allItems.length}`);
   setProgress(100);
   setTimeout(() => setProgress(0), 600);
 
@@ -589,20 +997,29 @@ async function loadAll() {
   renderSparkline();
 }
 
-// ── RENDER ─────────────────────────────────────────────────────────────────
+// ── RENDER ─────────────────────────────────────────────
 
-function render() {
-  const body = document.getElementById('feed-body');
-
-  const filtered = allItems.filter(i => {
+function getFiltered() {
+  return allItems.filter(i => {
     if (!activeSources.has(i.src) || !activeTopics.has(i.topic)) return false;
     if (activeKeywords.length === 0) return true;
     const haystack = (i.title + ' ' + i.desc).toLowerCase();
     return activeKeywords.every(kw => haystack.includes(kw));
   });
+}
 
+function render() {
+  const filtered = getFiltered();
   document.getElementById('count').textContent = `${filtered.length} stories`;
 
+  // Desktop table
+  renderTable(filtered);
+  // Mobile cards
+  renderCards(filtered);
+}
+
+function renderTable(filtered) {
+  const body = document.getElementById('feed-body');
   if (filtered.length === 0) {
     const msg = (activeSources.size === 0 || activeTopics.size === 0)
       ? 'NO FEEDS ACTIVE — SELECT SOURCES AND TOPICS TO BEGIN'
@@ -610,7 +1027,6 @@ function render() {
     body.innerHTML = `<tr id="empty-row"><td colspan="4">${msg}</td></tr>`;
     return;
   }
-
   body.innerHTML = filtered.map(item => {
     const { ageClass } = formatAge(item.date);
     const timeStr = item.date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
@@ -632,18 +1048,42 @@ function render() {
   }).join('');
 }
 
-// ── TOOLTIP ────────────────────────────────────────────────────────────────
+function renderCards(filtered) {
+  const wrap = document.getElementById('card-feed');
+  if (filtered.length === 0) {
+    const msg = (activeSources.size === 0 || activeTopics.size === 0)
+      ? 'NO FEEDS ACTIVE — TAP ⚙ TO SELECT SOURCES' : 'NO RESULTS';
+    wrap.innerHTML = `<div id="card-empty">${msg}</div>`;
+    return;
+  }
+  wrap.innerHTML = filtered.map(item => {
+    const { ageClass } = formatAge(item.date);
+    const timeStr = item.date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+    const desc = item.desc && item.desc !== '—' ? `<div class="card-desc">${escHtml(item.desc)}</div>` : '';
+    return `<a class="feed-card" href="${item.link}" target="_blank" rel="noopener">
+      <div class="card-meta">
+        <span class="source-badge src-${item.src}">${item.src}</span>
+        <span class="topic-badge topic-${item.topic}">${item.topic}</span>
+        <span class="card-time ${ageClass}">${timeStr}</span>
+      </div>
+      <div class="card-headline">${escHtml(item.title)}</div>
+      ${desc}
+    </a>`;
+  }).join('');
+}
+
+// ── TOOLTIP (desktop only) ─────────────────────────────
 
 const tip = document.getElementById('tooltip');
 
 function showTip(e, el) {
+  if (isMobile()) return;
   const desc = el.getAttribute('data-desc');
   if (!desc || desc === '—') return;
   tip.textContent = desc;
   tip.style.display = 'block';
   moveTip(e);
 }
-
 function moveTip(e) {
   const pad = 14, tw = tip.offsetWidth, th = tip.offsetHeight;
   let x = e.clientX + pad, y = e.clientY + pad;
@@ -652,25 +1092,25 @@ function moveTip(e) {
   tip.style.left = x + 'px';
   tip.style.top  = y + 'px';
 }
-
 function hideTip() { tip.style.display = 'none'; }
 
-// ── FILTERS ────────────────────────────────────────────────────────────────
+// ── FILTERS (desktop) ──────────────────────────────────
 
 function toggleFilter(btn, type) {
   if (type === 'src') {
     const val = btn.dataset.src;
     if (activeSources.has(val)) { activeSources.delete(val); btn.classList.remove('active'); }
-    else                        { activeSources.add(val);    btn.classList.add('active');    }
+    else { activeSources.add(val); btn.classList.add('active'); }
   } else {
     const val = btn.dataset.topic;
     if (activeTopics.has(val)) { activeTopics.delete(val); btn.classList.remove('active'); }
-    else                       { activeTopics.add(val);    btn.classList.add('active');    }
+    else { activeTopics.add(val); btn.classList.add('active'); }
   }
+  updateFabCount();
   render();
 }
 
-// ── KEYWORDS ───────────────────────────────────────────────────────────────
+// ── KEYWORDS (desktop) ────────────────────────────────
 
 document.getElementById('keyword-input').addEventListener('keydown', function(e) {
   if (e.key === 'Enter' || e.key === ',') {
@@ -679,12 +1119,14 @@ document.getElementById('keyword-input').addEventListener('keydown', function(e)
     if (val && !activeKeywords.includes(val)) {
       activeKeywords.push(val);
       renderKeywordTags();
+      updateFabCount();
       render();
     }
     this.value = '';
   } else if (e.key === 'Backspace' && this.value === '' && activeKeywords.length > 0) {
     activeKeywords.pop();
     renderKeywordTags();
+    updateFabCount();
     render();
   }
 });
@@ -698,20 +1140,20 @@ function renderKeywordTags() {
 function removeKeyword(i) {
   activeKeywords.splice(i, 1);
   renderKeywordTags();
+  updateFabCount();
   render();
 }
 
-// ── SPARKLINE ──────────────────────────────────────────────────────────────
+// ── SPARKLINE ──────────────────────────────────────────
 
 function renderSparkline() {
   const wrap = document.getElementById('sparkline');
-  if (!wrap) return;
+  if (!wrap || wrap.offsetWidth === 0) return;
 
   const BAR_W = 2, GAP = 1, UNIT = BAR_W + GAP;
   const availW = wrap.offsetWidth;
   const BUCKETS = Math.max(24, Math.floor(availW / UNIT));
   const bucketMs = 86400000 / BUCKETS;
-
   const now = Date.now();
   const counts = new Array(BUCKETS).fill(0);
 
@@ -749,15 +1191,11 @@ function renderSparkline() {
   wrap.innerHTML = counts.map((c, i) => {
     const pct = Math.max(Math.round((c / max) * 100), c > 0 ? 5 : 2);
     const color = bucketColor(i, c);
-    const agoMins = Math.round(((BUCKETS - 1 - i) / BUCKETS) * 1440);
-    const label = agoMins < 60
-      ? `${agoMins}m ago · ${c} articles`
-      : `${Math.floor(agoMins/60)}h${agoMins%60 ? (agoMins%60)+'m' : ''} ago · ${c} articles`;
-    return `<div class="spark-bar" style="height:${pct}%;width:${BAR_W}px;background:${color}" title="${label}"></div>`;
+    return `<div class="spark-bar" style="height:${pct}%;width:${BAR_W}px;background:${color}"></div>`;
   }).join('');
 }
 
-// ── HELPERS ────────────────────────────────────────────────────────────────
+// ── HELPERS ────────────────────────────────────────────
 
 function setStatus(state, text) {
   document.getElementById('status-dot').className = state;
@@ -770,7 +1208,7 @@ function setProgress(pct) {
 
 function formatAge(date) {
   const mins = Math.floor((Date.now() - date) / 60000);
-  if (mins < 30)  return { ageClass: 'age-fresh'  };
+  if (mins < 30)  return { ageClass: 'age-fresh' };
   if (mins < 180) return { ageClass: 'age-recent' };
   return { ageClass: 'age-old' };
 }
@@ -779,7 +1217,7 @@ function escHtml(str) {
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 }
 
-// ── INIT ───────────────────────────────────────────────────────────────────
+// ── INIT ───────────────────────────────────────────────
 
 loadAll();
 setInterval(loadAll, 5 * 60 * 1000);
