@@ -13,6 +13,10 @@
 
   runTransaction(ref(db, "visits/newsfeed"), n => (n || 0) + 1);
   runTransaction(ref(db, "visits/total"),    n => (n || 0) + 1);
+
+  window._analyticsDb = db;
+  window._analyticsRef = ref;
+  window._analyticsTransaction = runTransaction;
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -575,6 +579,12 @@ async function loadAll() {
     `updated ${new Date().toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false})}`;
 
   if (window.logPull) window.logPull(results.length);
+
+  if (window._analyticsTransaction) {
+    window._analyticsTransaction(window._analyticsRef(window._analyticsDb, "visits/newsfeed"), n => (n || 0) + 1);
+    window._analyticsTransaction(window._analyticsRef(window._analyticsDb, "visits/total"),    n => (n || 0) + 1);
+  }
+
   render();
   renderSparkline();
 }
@@ -697,7 +707,6 @@ function renderSparkline() {
   const wrap = document.getElementById('sparkline');
   if (!wrap) return;
 
-  // measure available width: each bar is 2px + 1px gap = 3px per bar
   const BAR_W = 2, GAP = 1, UNIT = BAR_W + GAP;
   const availW = wrap.offsetWidth;
   const BUCKETS = Math.max(24, Math.floor(availW / UNIT));
@@ -737,7 +746,6 @@ function renderSparkline() {
     return `rgb(${r},${g},${b})`;
   }
 
-  const intervalMins = Math.round(bucketMs / 60000);
   wrap.innerHTML = counts.map((c, i) => {
     const pct = Math.max(Math.round((c / max) * 100), c > 0 ? 5 : 2);
     const color = bucketColor(i, c);
