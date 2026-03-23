@@ -42,6 +42,8 @@
     --source-wsj:  #3b82f6;
     --source-nyt:  #e5e7eb;
     --source-scmp: #facc15;
+    --source-rtr:  #ff6a3d;
+    --source-yaho: #7c3aed;
     --topic-markets:  #34d399;
     --topic-economy:  #60a5fa;
     --topic-politics: #f472b6;
@@ -217,6 +219,8 @@
   .src-WSJ  { color: var(--source-wsj);  border: 1px solid #0e2040; background: #060e1a; }
   .src-NYT  { color: var(--source-nyt);  border: 1px solid #2a2a2a; background: #141414; }
   .src-SCMP { color: var(--source-scmp); border: 1px solid #3a3000; background: #1a1500; }
+  .src-RTR  { color: var(--source-rtr);  border: 1px solid #3a1a0a; background: #1a0d05; }
+  .src-YAHO { color: var(--source-yaho); border: 1px solid #1f0e3d; background: #0f071e; }
 
   .cell-tag { white-space: nowrap; }
 
@@ -726,6 +730,8 @@ window.logPull = function(count) {
       <button class="filter-btn active" data-src="WSJ"  onclick="toggleFilter(this,'src')">WSJ</button>
       <button class="filter-btn active" data-src="NYT"  onclick="toggleFilter(this,'src')">NYT</button>
       <button class="filter-btn active" data-src="SCMP" onclick="toggleFilter(this,'src')">SCMP</button>
+      <button class="filter-btn active" data-src="RTR"  onclick="toggleFilter(this,'src')">Reuters</button>
+      <button class="filter-btn active" data-src="YAHO" onclick="toggleFilter(this,'src')">Yahoo</button>
     </div>
     <div class="sidebar-section">
       <div class="sidebar-label">Topic</div>
@@ -772,6 +778,8 @@ const CORS_PROXIES = [
   url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
 ];
 
+const ALL_SOURCES = ['BBG','WSJ','NYT','SCMP','RTR','YAHO'];
+
 const FEEDS = [
   { url: 'https://feeds.bloomberg.com/economics/news.rss',                  src: 'BBG',  topic: 'Economy'  },
   { url: 'https://feeds.bloomberg.com/markets/news.rss',                    src: 'BBG',  topic: 'Markets'  },
@@ -796,10 +804,12 @@ const FEEDS = [
   { url: 'https://www.scmp.com/rss/92/feed/',                                src: 'SCMP', topic: 'Business' },
   { url: 'https://www.scmp.com/rss/36/feed/',                                src: 'SCMP', topic: 'Tech'     },
   { url: 'https://www.scmp.com/rss/4/feed',                                  src: 'SCMP', topic: 'China'    },
+  { url: 'https://ir.thomsonreuters.com/rss/news-releases.xml?items=15',     src: 'RTR',  topic: 'Markets'  },
+  { url: 'https://news.yahoo.com/rss/tech',                                  src: 'YAHO', topic: 'Tech'     },
 ];
 
 let allItems       = [];
-let activeSources  = new Set(['BBG','WSJ','NYT','SCMP']);
+let activeSources  = new Set(ALL_SOURCES);
 let activeTopics   = new Set(['Economy','Markets','Politics','Tech','Business','World','China','US']);
 let activeKeywords = [];
 
@@ -811,7 +821,7 @@ function buildDrawerChips() {
   const srcWrap   = document.getElementById('drawer-src-chips');
   const topicWrap = document.getElementById('drawer-topic-chips');
 
-  srcWrap.innerHTML = ['BBG','WSJ','NYT','SCMP'].map(s =>
+  srcWrap.innerHTML = ALL_SOURCES.map(s =>
     `<button class="drawer-chip ${activeSources.has(s)?'active':''}" data-src="${s}" onclick="toggleDrawerChip(this,'src')">${s}</button>`
   ).join('');
 
@@ -845,8 +855,7 @@ function syncDesktopFilters() {
 }
 
 function updateFabCount() {
-  const totalFilters = 4 + 8; // all sources + all topics
-  const activeCount  = activeSources.size + activeTopics.size + activeKeywords.length;
+  const totalFilters = ALL_SOURCES.length + 8; // all sources + all topics
   const inactive     = totalFilters - activeSources.size - activeTopics.size;
   const el = document.getElementById('fab-count');
   if (inactive > 0 || activeKeywords.length > 0) {
