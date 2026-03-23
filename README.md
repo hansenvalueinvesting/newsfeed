@@ -10,5 +10,3 @@ https://hansenvalueinvesting.github.io/newsfeed/
 - auto-refreshes every 5 minutes
 - tracks a running lifetime count of every article pull across all users
 - sparkline showing distribution of articles across the last 24hrs
-
-built by hansen with the help of Claude
